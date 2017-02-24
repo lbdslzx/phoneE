@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+		<include file="Public:easyui_res" />		
+		<load href="__PUBLIC__/js/ajaxfileupload.js" />
+    </head>
+    <body >
+	<div class="easyui-panel" title="{$title}" style="width:100%;">
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post" action="__URL__/edit">
+	    	<table cellpadding="5">
+	    		    			<tr>
+	    			<td>医生名称：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="doctor_name" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>医生所在科室：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="doctor_department" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>文件标题：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="file_title" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<!-- 根据实际情况添加其他列 -->
+	    		<tr>
+	    			<td>音频文件描述：</td>
+	    			<td><input class="easyui-textbox" type="text" name="file_desc"  data-options="multiline:true,required:true" style="width:300px;height:50px"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>音频文件名称：</td>
+	    			<td>	    	
+	    				<input class="easyui-textbox" type="text" name="file_name"  data-options="required:true" ></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>音频时长：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="file_duration" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>图片名称：</td>
+	    			<td>
+			        <input class="easyui-textbox" type="text" name="picture_name"  data-options="required:true" ></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>是否推荐：</td>
+	    			<td>
+		    			<select class="easyui-combobox" name="is_recommend">
+		    				<option value="1">是</option>
+		    				<option value="0">否</option>
+		    			</select>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>推荐开始时间：</td>
+	    			<td><input class="easyui-datetimebox" id="recommend_begin_dt" name="recommend_begin_dt" data-options="required:true,editable:false" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>推荐结束时间：</td>
+	    			<td><input class="easyui-datetimebox" id="recommend_end_dt"  name="recommend_end_dt"  data-options="required:true,editable:false" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>排序时间：</td>
+	    			<td><input class="easyui-datetimebox" id="upd_dt"  name="upd_dt"  data-options="required:true" ></input>服务器按照时间降序排列</td>
+	    		</tr>
+	    		</table>
+	    		<div style="display: none">
+	    		<input class="easyui-textbox" name="picture_name" id="h_pic_name">
+			    <input class="easyui-textbox" name="file_name" id="h_ivr_file" >
+			    <input class="easyui-textbox" name="id" value=""></input>
+			    </div>
+	    	</form>
+	    		
+	    	
+	    <input type="hidden" name="upload_addr" id="upload_addr" value="{$upload_addr}">
+
+	     <div style="padding:5px">
+	     	<a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-add'" style="width:100px;height:32px">保存</a>
+	      <a href="#" class="easyui-linkbutton" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+	    </div>
+	    </div>
+	</div>
+	<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				onSubmit:function(){
+					var json = form2Json("ff");
+					var end_dt = myparser(json.recommend_end_dt);
+					var begin_dt = myparser(json.recommend_begin_dt);
+					begin_dt = Date.parse(begin_dt);
+					end_dt = Date.parse(end_dt);
+					if(begin_dt > end_dt){
+						m_info("推荐开始时间不能大于结束时间");
+						return false;
+					}
+					var form_valid = $(this).form('enableValidation').form('validate');
+					if(!form_valid ){
+						return false; 
+					}
+					/*
+					var pic = $("#h_pic_name").val()
+					var ivr_file = $("#h_ivr_file").val()
+					if(pic == "" || ivr_file =="" ){
+						$.messager.alert("提示","请上传图片和ivr文件");
+						return false; 
+					}
+					*/
+					json = JSON.stringify(json);
+					 $.post("__URL__/edit/"+Math.random(), "json=" + json, function(data) {
+			             if (data >0) {
+			            	 $.messager.alert("提示","操作成功");
+			             }else{
+			            	 $.messager.alert("提示","操作失败,请勿重复添加");
+			             }
+			         });
+					 return false;
+				}
+			});
+			
+		
+		}
+
+		/**
+			field_id 文件控件id
+			h_target_id 存储值id
+		*/
+		 function ajaxFileUpload(file_id,h_target_id){
+			 var file_name = $("#"+file_id).val();     
+				if(file_name == "" ){
+					$.messager.alert('提示','请选择文件!');
+					return false;
+				}
+//				var action_url = $("#upload_addr").val();
+				var action_url = 'http://localhost/hfs/?json={"op_type":"3006","user_mobile":"1000","task_id":"12","c_type":"1","sid":"0","c_ver":"0","act_type":"1","user_id":"123156","gender":"0","file_name":"123.wav","pid":"5"}';
+				action_url = decodeURIComponent(action_url);
+				var reg = new RegExp("temp_file.name");
+				action_url = action_url.replace(reg,file_name);
+				action_url = decodeURIComponent(action_url);
+	         $.ajaxFileUpload
+	         (
+	             {
+	                 url: action_url, //用于文件上传的服务器端请求地址
+	                 type: 'post',
+	                 data: { }, //此参数非常严谨，写错一个引号都不行
+	                 secureuri: false, //一般设置为false
+	                 fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+	                 dataType: 'json', //返回值类型 一般设置为json
+	                 success: function (data, status)  //服务器成功响应处理函数
+	                 {
+	                     if(data.code == 0){
+	                    	 $.messager.alert('提示','文件上传成功!');
+	                    	 $("#"+h_target_id).val(data.file_name);
+	                    	 var test = $("#"+h_target_id).val();
+//	                         $("#file_pic_img").attr("src","{$hfs_addr}3006/5/"+data.file_name);
+//	                         $("#"+target_id).val(data.file_name);
+	                     }else{
+	                    	 $.messager.alert('提示',data.error);
+	                     }                    
+	                 },
+	                 error: function (data, status, e)//服务器响应失败处理函数
+	                 {
+	                     alert(e);
+	                 }
+	             }
+	         )
+	         return false;
+	     }
+		$(function(){
+			$('#ff').form('load', {$data});			
+		});
+
+	</script>
+	
+    </body>
+</html>
+

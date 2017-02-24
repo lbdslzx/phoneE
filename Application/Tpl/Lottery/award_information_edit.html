@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>领奖信息维护</title>
+    <include file="Public:easyui_res"/>
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<div class="easyui-panel" style="width:100%;"><div style="padding:10px 60px 20px 60px">
+    <form id="ff" method="post">
+        <table cellpadding="5">
+            <tr>
+                <td>抽奖码：</td>
+                <td>
+                    <select id="draw_code" name="draw_code" style="width: 204px;height: 30px">
+                        <option value="0">--请选择--</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>用户ID：</td>
+                <td>
+                    <input id="user_id" name="user_id" readonly="readonly" value="{$detail.user_id}" style="width: 200px;height: 30px">
+                </td>
+            </tr>
+            <tr>
+                <td>用户昵称：</td>
+                <td>
+                    <input id="user_name" name="user_name" readonly="readonly" value="{$detail.user_name}" style="width: 200px;height: 30px">
+                </td>
+            </tr>
+            <tr>
+                <td>绑定手机号：</td>
+                <td>
+                    <input id="phone_num" name="phone_num" readonly="readonly" value="{$detail.phone_num}" style="width: 200px;height: 30px">
+                </td>
+            </tr>
+            <tr>
+                <td>摇奖期号：</td>
+                <td>
+                    <input id="lottery_code" name="lottery_code" readonly="readonly" value="{$detail.lottery_code}" style="width: 200px;height: 30px">
+                    <input id="lottery_id" name="lottery_id" type="hidden" readonly="readonly" value="{$detail.lottery_id}" >
+                </td>
+            </tr>
+            <tr>
+                <td>奖品名称：</td>
+                <td>
+                    <input id="prize_name" name="prize_name" readonly="readonly" value="{$detail.prize_name}" style="width: 200px;height: 30px">
+                </td>
+            </tr>
+            <tr>
+                <td>领奖信息：</td>
+                <td>
+                    <textarea id="prize_intro" name="prize_intro" style="width: 300px;height: 100px;">{$detail.prize_intro}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="saveAward()" data-options="iconCls:'icon-save'" style="width:100px;height:30px">保存</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div></div>
+<script type="text/javascript">
+    $(function () {
+        var award_json = {$award_data};
+        var draw_code = '{$detail.draw_code}';
+        for(var i = 0; i < award_json.length; i ++){
+            if(draw_code == award_json[i]['draw_code']){
+                $("#draw_code").append("<option selected='selected' value='" + award_json[i]['draw_code'] + "'>" + award_json[i]['draw_code'] + "</option>");
+                $("#user_id").val(award_json[i]['user_id']);
+                $("#lottery_code").val(award_json[i]['lottery_code']);
+                $("#lottery_id").val(award_json[i]['lottery_id']);
+                $("#prize_name").val(award_json[i]['prize_name']);
+                getUserInfo(award_json[i]['user_id']);
+            }else {
+                $("#draw_code").append("<option value='" + award_json[i]['draw_code'] + "'>" + award_json[i]['draw_code'] + "</option>");
+            }
+        }
+        $('#draw_code').change(function(){
+            var code = $('#draw_code option:selected') .val();
+            for(var i = 0; i < award_json.length; i ++) {
+                if (code == award_json[i]['draw_code']) {
+                    $("#user_id").val(award_json[i]['user_id']);
+                    $("#lottery_code").val(award_json[i]['lottery_code']);
+                    $("#lottery_id").val(award_json[i]['lottery_id']);
+                    $("#prize_name").val(award_json[i]['prize_name']);
+                    getUserInfo(award_json[i]['user_id']);
+                }
+            }
+            if(code == "0"){
+                $("#user_id").val('');
+                $("#lottery_code").val('');
+                $("#lottery_id").val('');
+                $("#prize_name").val('');
+                $("#user_name").val("");
+                $("#phone_num").val("");
+            }
+        });
+    });
+    function getUserInfo(userId) {
+        $.ajax({
+            url: '__URL__/getUserInfo',
+            type: 'post',
+            data: {'user_id': userId},
+            cache: false,
+            dataType: 'json',
+            success: function (data) {
+                $("#user_name").val(data.user_name);
+                $("#phone_num").val(data.phone_num);
+            },
+            error: function () {
+                layer.msg("异常");
+            }
+        });
+    }
+    var btn = true;
+    function saveAward() {
+        var code = $('#draw_code option:selected') .val();
+        if(code == "0"){
+            layer.msg("请选择摇奖码！");
+            return;
+        }
+        var prize_intro = $("#prize_intro").val().trim();
+        if(prize_intro == ''){
+            layer.msg("领奖信息不能为空！");
+            return;
+        }
+        if(!btn){
+            return false;
+        }
+        btn = false;
+        $('#ff').form('submit',{
+            onSubmit:function(){
+            },
+            success:function(data){
+                if (data >0) {
+                    layer.msg("操作成功");
+                    parent.window.location.href = "__URL__/awardInformation";
+                    var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                    parent.layer.close(index);
+                }else{
+                    btn = true;
+                    layer.msg("操作失败,数据无变化");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

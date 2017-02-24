@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反馈详情</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div class="easyui-panel" title="详情" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/see">
+            <table cellpadding="5">
+                <tr>
+                    <td width="10%">用户姓名：</td>
+                    <td>{$detail.name}</td>
+                </tr>
+                <tr>
+                    <td>电子邮件：</td>
+                    <td>{$detail.email_addr}</td>
+                </tr>
+                <tr>
+                    <td>手机号码：</td>
+                    <td>{$detail.phone_number}</td>
+                </tr>
+                <tr>
+                    <td>手机型号：</td>
+                    <td>{$detail.phone_type}</td>
+                </tr>
+                <tr>
+                    <td>系统版本：</td>
+                    <td>{$detail.phone_os_version}</td>
+                </tr>
+                <tr>
+                    <td>软件版本：</td>
+                    <td>{$detail.rom_version}</td>
+                </tr>
+                <tr>
+                    <td>反馈内容：</td>
+                    <td>{$detail.content}</td>
+                </tr>
+                <tr>
+                    <td>提交时间：</td>
+                    <td>{$detail.log_dt}</td>
+                </tr>
+                <tr>
+                    <td>回复内容：</td>
+                    <td>{$detail.reply_content}</td>
+                </tr>
+                <tr>
+                    <td>回复时间：</td>
+                    <td>{$detail.reply_dt}</td>
+                </tr>
+                <tr>
+                    <td>回复人：</td>
+                    <td>{$detail.reply_user}</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:30px" onclick="javascript:window.location.href='__URL__/index'">返回</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body>
+    <script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		<form name="searchform" method="get" action="" id ="searchform">    
+    	<input class="easyui-textbox"  name="brand_name" data-options="prompt:'按照品牌名查找'" style="width:140px;height:32px">
+
+	    	<input class="easyui-textbox"  name="pharmacy_name" data-options="prompt:'按照药店名查找'" style="width:140px;height:32px">
+	        <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px;margin-left: 10px">查询</a>
+	        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add"  style="width:60px;height:32px;float: right" onclick="javascript:window.location.href='__URL__/add'">添加</a>
+ 		</form>
+		</div>
+	</div>
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+		<thead>
+			<tr>
+				<volist name="table_title" id="vo"  >
+					<th data-options="field:'{$key}',align:'center',width:'10px'">{$vo}</th>
+				</volist>
+			</tr>
+		</thead>
+	</table>
+
+
+</script>
+    </body>
+</html>

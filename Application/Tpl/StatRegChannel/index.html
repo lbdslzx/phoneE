@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		<form name="searchform" method="get" action="" id ="searchform">
+		查找类型: <select class="easyui-combobox" id="type_id" name="type_id">
+        <option value="">全部</option>
+        	<volist id="vo" name = "channel" >
+			<option value="{$vo.channel_name}">{$vo.channel_name}</option>
+			</volist>
+							
+		</select>   
+		
+		统计时间从<input class="easyui-datebox" id="bt"  name="bt"  data-options="required:true" ></input>
+		到<input class="easyui-datebox" id="et"  name="et"  data-options="required:true" ></input>
+  	      <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"   style="width:60px;height:32px;margin-left: 10px;">查询</a>
+	        <input type="hidden" name="is_client" value="true"><!-- 标记查询是否由客户端发出 -->
+ 		</form>
+		</div>
+	</div>
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:false,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			onLoadSuccess:function(data){ loaddgSuc(data);}
+			">
+		<thead>
+			<tr>
+				<volist name="table_title" id="vo"  >
+					<th data-options="field:'{$key}',align:'center',width:'50px'">{$vo}</th>
+				</volist>
+			</tr>
+		</thead>
+	</table>
+	<div id="msg" style="width: 100%;color: red;font-size: 14px;text-align: center;"></div>
+<script>
+
+$(function(){
+	//设置datetime控件时间
+	var curr_time = new Date();
+	var time = new Date().Format("yyyy-MM-dd");
+	$("#et").datebox("setValue",time);
+	var timestamp =Date.parse(curr_time);
+	timestamp -= 15*24*3600*1000;  
+	var new_time = new Date(timestamp); 
+	var new_time = DateTimeformat(new_time);
+	$("#bt").datebox('setValue',new_time );
+	$("#submit_search").click();
+
+ });
+
+</script>
+    </body>
+</html>

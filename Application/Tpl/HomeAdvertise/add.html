@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body >
+	<div class="easyui-panel" title="{$title}" style="width:100%;">
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post" action="__URL__/add">
+	    	<table cellpadding="5">
+	    	
+	    		<tr>
+	    			<td>   跳转类型:</td>
+	    			<td>
+	    			<select class="easyui-combobox" name="type" >
+	    		    	<volist id="vo" name="forward_type" >
+			    	<option value="{$key}">{$vo}</option>	    	 
+			    		    	</volist>
+					</select>
+	    			</td>
+	    		</tr>
+	    		
+	    		<tr>
+	    			<td>跳转url：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="open_url" style="width: 300px;height: 50px" data-options="validType:'url',multiline:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+				<td>跳转模块：</td>
+	    			<td>	    			
+	    			<select class="easyui-combobox" name="app_module" >
+	    		    	<volist id="vo" name="all_forward_module" >
+			    	<option value="{$key}">{$vo}</option>	    	 
+			    		    	</volist>
+					</select>
+	    			</td>
+	    		</tr>
+	    		
+	    		<tr>
+	    			<td>描述：</td>
+					<td>
+		    			<input class="easyui-textbox" type="text" name="describe"  style="height: 50px;width: 300px"  ></input>
+	    			</td>
+	    		</tr>
+	    		
+	    		<tr>
+	    			<td>发布状态:</td>
+	    			<td>
+		    			 
+	    		    	<select class="easyui-combobox" name="publish_state" >
+	    		    	<volist id="vo" name="all_publish_state" >
+	    				<option value="{$key}">{$vo}</option>	    	 
+	    		    	</volist>
+	    			</td>
+	    		</tr>
+	    		
+	    		</table>
+	    	</form>
+	     <div style="padding:5px">
+	     	<a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-add'" style="width:100px;height:32px">添加</a>
+	      <a href="#" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+	    </div>
+	    </div>
+	</div>
+	<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				onSubmit:function(){
+					var form_valid = $(this).form('enableValidation').form('validate');
+					if(!form_valid ){
+						return false; 
+					}
+				},
+				success:function(data){
+					 if (data >0) {
+						 alert("操作成功");
+//		            	 $.messager.alert("提示","操作成功");
+		            	 setTimeout($("#return").click(),3000);
+		             }else{
+		            	 $.messager.alert("提示","操作失败");
+		             }
+				}
+			});
+			
+		
+		}
+
+		
+	</script>
+	
+    </body>
+</html>
+

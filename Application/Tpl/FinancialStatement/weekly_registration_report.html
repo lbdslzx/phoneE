@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>财务后台-周汇款报表</title>
+    <include file="Public:common_res" />
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto; line-height: 40px">
+            <label for="time_for">汇款周期：</label>
+            <input type="datetime" value="{$timeFor}" class="easyui-datebox" name="time_for" id="time_for" style="width:180px;height:32px">
+            <label>至</label>
+            <input style="width:180px;height:32px" value="{$timeTo}" class="easyui-datebox" type="datetime" name="time_to" id="time_to">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; height: 600px;"  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:false,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getWeeklyRegistrationReportList',
+			method:'post',
+			toolbar:'#tb',
+			pageSize: 30,
+			pageList: [30,50,100],
+			onLoadSuccess:totals,
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'stat_dt',align:'center',width:'10px'">汇款周期</th>
+        <eq name="surplus" value="true">
+            <th data-options="field:'surplus_value',align:'center',width:'10px'">手续费盈余(元)</th>
+        </eq>
+        <th data-options="field:'ghao_value',align:'center',width:'10px'">挂号费（元）</th>
+        <th data-options="field:'ghao_back_value',align:'center',width:'10px'">挂号费退款（元）</th>
+        <th data-options="field:'remit_value',align:'center',width:'10px'">应汇款（元）</th>
+        <th data-options="field:'remit_state',align:'center',width:'10px'">汇款状态</th>
+    </tr>
+    </thead>
+</table>
+<div style="padding:5px;height:auto;background: #F4F4F4;border: 1px solid #95B8E7;border-top: none;height: auto;line-height: 32px;">
+    <div style="width: 100%;height: 32px;line-height: 32px;margin: 0 auto;border-bottom: 1px solid #95B8E7;">
+        <span style="font-size: 14px">待汇款总计：<strong id="total" style="color: red;margin-right: 4px">0.00</strong>元</span>
+        <eq name="permissions" value="remit">
+            <span>
+                <a href="javascript:void(0);" id="remittance" onclick="remittances()" class="easyui-linkbutton" style="height: 24px;margin-bottom: 4px;margin-left: 4px;padding: 0 10px;font-weight: bold">汇款</a>
+            </span>
+            <span style="float: right">
+                <a href="javascript:void(0);" id="export" class="easyui-linkbutton" style="height: 24px;margin-bottom: 4px;margin-left: 4px;padding: 0 10px;font-weight: bold">导出</a>
+            </span>
+        </eq>
+    </div>
+    <div style="height: auto;width: 100%;font-size: 10px;line-height: 20px">
+        <span>说明：</span><br/>
+        <span>1.该报表仅统计线上已支付订单；</span><br/>
+        <span>2.挂号费退款，仅统计财务已审批退款订单；</span><br/>
+        <span>3.应汇款=挂号费-挂号费退款。</span>
+    </div>
+</div>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height -150;
+    $("#dg").css("height",height+"px");
+    var start_dt = new Array();
+    var total = 0;
+    var stat_dt = new Array();
+    var permissions = "{$permissions}";
+    function totals(data) {
+        var rows = data.rows,length = rows.length;
+        var totalRow = {stat_dt:"<b>合计：</b>",surplus_value:0,ghao_value:0,ghao_back_value:0,remit_value:0};
+        total = 0;start_dt=new Array(),stat_dt=new Array();
+        for(var i = 0; i < length; i++){
+            if(rows[i].remit_state == "未汇款"){
+                total += Number(rows[i].remit_value);
+                start_dt.push(rows[i].start_dt);
+                stat_dt.push(rows[i].stat_dt);
+            }
+            totalRow.surplus_value += Number(rows[i].surplus_value);
+            totalRow.ghao_value += Number(rows[i].ghao_value);
+            totalRow.ghao_back_value += Number(rows[i].ghao_back_value);
+            totalRow.remit_value += Number(rows[i].remit_value);
+        }
+        total = total.toFixed(2);
+        totalRow.surplus_value = "<b>" + totalRow.surplus_value.toFixed(2) + "</b>";
+        totalRow.ghao_value = "<b>" + totalRow.ghao_value.toFixed(2) + "</b>";
+        totalRow.ghao_back_value = "<b>" + totalRow.ghao_back_value.toFixed(2) + "</b>";
+        totalRow.remit_value = "<b>" + totalRow.remit_value.toFixed(2) + "</b>";
+        $('#dg').datagrid('appendRow', totalRow);
+        if(total <= 0 && permissions == "remit"){
+            $('#remittance').linkbutton('disable');
+        }else {
+            $('#remittance').linkbutton('enable');
+        }
+        $("#total").html(total);
+    }
+    function remittances() {
+        var remitUrl = "{$remitUrl}";
+        window.open(remitUrl);
+        $("#remittance").click(function () {
+            layer.msg("已汇款？",{
+                time: 60000,
+                btn: ['是', '否'],
+                yes:function(){
+                    $('#remittance').linkbutton('disable');
+                    $.ajax( {
+                        url: '__URL__/weeklyRegistrationReportRemit',
+                        type: 'post',
+                        data: {'start_dt':start_dt,"interval":stat_dt,"total":total},
+                        cache:false,
+                        dataType:'json',
+                        success: function (data){
+                            if(data > 0 ){
+                                layer.msg('已确定汇款！');
+                                $('#dg').datagrid({ queryParams: form2Json("searchform") });
+                            }else{
+                                layer.msg("请重新操作！");
+                                if(permissions == "remit") $('#remittance').linkbutton('enable');
+                            }
+                        },
+                        error: function (){
+                            layer.msg("系统异常！");
+                            if(permissions == "remit") $('#remittance').linkbutton('enable');
+                        }
+                    });
+                }
+            });
+        });
+    }
+    function formatState(val,row) {
+        if(Number(val) == 0){
+            return "待汇款";
+        }else if(Number(val) == 1) {
+            var remark = row.remark.split("#");
+            return remark[0]+"已汇款";
+        }else {
+            return "";
+        }
+    }
+    $(function () {
+        $("#export").click(function () {
+            var json = form2Json("searchform");
+            var url = '__URL__/exportExcel?';
+            for (var x in json) {
+                url = url + "&" + x + "=" + json[x];
+            }
+            location.href = url;
+        });
+    })
+</script>
+</body>
+</html>

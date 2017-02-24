@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>药店编辑</title>
+    <include file="Public:common_res" />
+    <style type="text/css">
+        a{text-decoration:none;}
+        .btn_addPic{
+            display: block;
+            position: relative;
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            border: 1px solid #EBEBEB;
+            background: none repeat scroll 0 0 #F3F3F3;
+            color: #999999;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn_addPic span{display: block;line-height: 80px;}
+        .btn_addPic em {
+            background:url(http://p7.qhimg.com/t014ce592c1a0b2d489.png) 0 0;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            overflow: hidden;
+            margin: 10px 5px 10px 0;
+            line-height: 120em;
+            vertical-align: middle;
+        }
+        .btn_addPic:hover em{background-position:-19px 0;}
+        .filePrew {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 120px;
+            height: 120px;
+            font-size: 100px; /* 增大不同浏览器的可点击区域 */
+            opacity: 0; /* 实现的关键点 */
+            filter:alpha(opacity=0);/* 兼容IE */
+        }
+    </style>
+</head>
+<body>
+<div class="easyui-panel" title="{$title}" style="width:100%;"><div style="padding:10px 60px 20px 60px"><form id="ff" method="post" ><table cellpadding="5">
+    <tr>
+        <td align="right"><span style="color:red">*</span>药房名字：</td>
+        <td>
+            <input class="easyui-textbox" type="text" id="pharmacy_name_id" name="pharmacy_name" style="width: 200px;height: 30px" value="{$info.pharmacy_name}"  data-options="prompt:'请输入药房名字'" >
+            <input type="hidden" readonly="readonly" name="pharmacy_id" value="{$info.pharmacy_id}">
+        </td>
+    </tr>
+    <tr>
+        <td align="right"><span style="color:red">*</span>所属地区：</td>
+        <td>
+            <select class="easyui-combobox" id="province" name="province" style="width:200px;height:32px;">
+                <option value="-1">--请选择--</option>
+                <volist name="province" id="vo"  >
+                    <option value="{$vo.id}" <eq name="vo.id" value="$info.province_id">selected="selected"</eq>>{$vo.name}</option>
+                </volist>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td align="right"><span style="color:red">*</span>电话：</td>
+        <td>
+            <input class="easyui-textbox" type="text" id="pharmacy_tel_id" value="{$info.pharmacy_tel}" style="width: 200px;height: 30px" name="pharmacy_tel" data-options="prompt:'请输入药店电话'" />
+        </td>
+    </tr>
+    <tr>
+        <td align="right"><span style="color:red">*</span>地址：</td>
+        <td>
+            <input class="easyui-textbox" type="text" id="pharmacy_addr" value="{$info.pharmacy_addr}" style="width: 200px;height: 30px" name="pharmacy_addr" data-options="prompt:'请输入药店地址'" />
+        </td>
+    </tr>
+    <tr>
+        <td align="right">
+            <span style="color:red">*</span>地图坐标：
+        </td>
+        <td>
+            <input class="easyui-textbox" type="text" id="map" name="map" style="width: 200px;height: 30px" value="{$info.longitude},{$info.latitude}" readonly="readonly" />
+            <a href="#" class="easyui-linkbutton" onclick="_getMap()" >获取坐标</a>
+        </td>
+    </tr>
+    <tr>
+        <td align="right">药房头像：<br>115*115&nbsp;</td>
+        <td>
+            <div id="pic" style="height:153px;width:153px;border:solid 1px silver;margin-bottom:10px;">
+                <img src='{$info.pharmacy_logo}'  style="display: block;height:153px;width:153px;" />
+            </div>
+            <input type="file" id="file_logo" name="file_logo" />
+            <input type="hidden" id="pharmacy_logo" name="pharmacy_logo" value="{$info.pharmacy_logo}" />
+            <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file_logo','pic','rep',Math.random());" >上传图片</a>
+            <span style="color: red">*</span>
+        </td>
+    </tr>
+    <tr>
+        <td align="right">标示：</td>
+        <td>
+            <input type="checkbox" <eq name="info.has_promotions" value="1">checked="checked"</eq> name="has_promotions" value="1">&nbsp;药店优惠
+            <input type="checkbox" <eq name="info.has_delivery" value="1">checked="checked"</eq> name="has_delivery" value="1">&nbsp;送药服务
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="2" align="right" style="min-height:50px;padding-top:15px;" valign="top">优惠信息：<br/>544*626&nbsp;</td>
+        <td style="min-height:50px;padding-top:15px;" valign="top">
+            <div id="pharmacy_pic_list" style="float:left;">
+                <foreach name="pic" item="vo">
+						<span id="de_id_db_{$vo.pic_id}">
+							<div style="width:120px;height:120px;border:solid 1px silver;float:left;margin:0 10px 10px 0;">
+                                <span onclick="delThisPic('de_id_db_{$vo.pic_id}','{$info.pharmacy_id}','{$vo.pic_id}');" style="float:right;position:relative;z-index:10;margin-bottom:-30px;cursor: pointer;">╳</span>
+                                <img src="{$vo.pic}" style="width:120px;height:120px;border:solid 0px green;">
+                            </div>
+						</span>
+                </foreach>
+
+                <A class=btn_addPic style="float:left;" href="javascript:void(0);"><SPAN><img src="__PUBLIC__/images/upload_img.jpg" style="width:120px;height:120px;" alt=""></SPAN> <INPUT class=filePrew title="添加图片" tabIndex=3 type=file id="my_imgs_file" name="my_imgs_file"onchange="ajaxFileUpload('my_imgs_file','pharmacy_pic_list','app',Math.random())+Math.random();" ></A>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-save'" style="width:100px;height:32px">保存</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+        </td>
+    </tr>
+</table></form></div></div>
+<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    function _getMap() {
+        var url = "__URL__/map?address="+$("#pharmacy_addr").val()+"&map="+$("#map").val()+"&id="+$("#phramacy_id").val();
+        bombBox(url,"经纬度","80%","95%","no",2);
+    }
+    function _closeMap() {
+        layer.closeAll();
+    }
+    function delThisPic(id,pharmacyId,pid) {
+        var index = layer.msg("确定删除？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消'],
+            yes: function () {
+                $.ajax({
+                    type: "POST",
+                    url: "__URL__/delPic/"+Math.random(),
+                    data: {"id":pharmacyId,"pid":pid},
+                    success: function(msg){
+                        if(msg>0){
+                            $("#"+id).remove();
+                        }else{
+                            layer.msg("操作失败");
+                        }
+                    }
+                });
+                layer.close(index);
+            }
+        });
+    }
+    function delThis(id){
+        var index = layer.msg("确认删除？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消'],
+            yes: function () {
+                $("#" + id).remove();
+                layer.close(index);
+            },
+        },function () {
+            layer.close(index);
+        });
+    }
+    var flag = 0;
+    function ajaxFileUpload(fileId,areaId,ty) {
+        /*var listLen=$("#pharmacy_pic_list>span").length;
+        if(listLen>=10){
+            layer.msg('优惠图片最多传10张!');
+            return false;
+        }*/
+        var fileName = $('#'+fileId).val();
+        if(fileName == '' ){
+            layer.msg('请选择图片!');
+            return false;
+        }
+        if(!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(fileName)){
+            layer.msg('请上传GIF/JPG/PNG格式的图片！');
+            return false;
+        }
+        $.ajaxFileUpload({
+            url: "__URL__/uploadPic",
+            type: 'post',
+            data: {"file_id":fileId},
+            secureuri: false, //一般设置为false
+            fileElementId: fileId, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+            dataType: 'text', //返回值类型 一般设置为json
+            success: function (data, status){
+                var reg = /<[^>]*>/;
+                data = data.replace(reg,"");
+                data = data.replace(reg,"");
+                var json = JSON.parse(data);
+                if(json.code == 0){
+                    var img_html ="";
+                    if(ty=='rep'){
+                        img_html = "<img src='"+json.img_url+"'  height='150px' />";
+                        $("#pharmacy_logo").val(json.img_url);
+                        $('#'+areaId).html(img_html);
+                    }
+                    if(ty=='app'){
+                        //内容为追加方式
+                        flag+=1;
+                        var del_id='de_id_'+flag;
+                        img_html="<span id="+del_id+"><div style='width:120px;height:120px;border:solid 1px silver;float:left;margin:0 10px 10px 0;'>";
+                        img_html =img_html+"<span onclick=\"delThis('"+del_id+"');\" style='float:right;position:relative;z-index:10;margin-bottom:-30px;cursor: pointer;'>╳</span><img src='"+json.img_url+"' style='width:120px;height:120px;border:solid 0px green;' />";
+                        img_html =img_html+"<input type='checkbox' style='display:none;' name='pics["+flag+"]' value='"+json.img_url+","+json.big_img_url+"' checked='checked' /></div></span>";
+                        $(".btn_addPic").before(img_html);
+                    }
+                }
+                layer.msg(json.message);
+            }
+        });
+    }
+    function submitForm() {
+        var data = form2Json("ff");
+        if(data.map=='' || data.map==','){
+            layer.msg("请获取药店地理坐标");
+            return;
+        }
+        if(data.pharmacy_name == ''){
+            layer.msg("请填写药店名称");
+            return;
+        }
+        if(data.pharmacy_tel == ''){
+            layer.msg("请填写药店电话");
+            return;
+        }
+        if(data.pharmacy_addr == ''){
+            layer.msg("请填写药店所在地址");
+            return;
+        }
+        var province = data.province;
+        if(Number(province) < 0){
+            layer.msg("请选择药店所在地区");
+            return;
+        }
+        if(data.pharmacy_logo == ""){
+            layer.msg("请上传药店头像");
+            return;
+        }
+        $('#ff').form('submit',{
+            onSubmit:function(){
+                $.post("__URL__/edit/"+Math.random(), data, function(data222) {
+                    if (data222 >0) {
+                        layer.msg("操作成功");
+                        window.location="__URL__/index";
+                    }else{
+                        layer.msg("操作失败,请勿重复添加");
+                    }
+                });
+                return false;
+            }
+        });
+    }
+</script>
+</body>
+</html>

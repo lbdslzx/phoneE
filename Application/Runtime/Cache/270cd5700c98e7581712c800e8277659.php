@@ -1,0 +1,38 @@
+<?php if (!defined('THINK_PATH')) exit();?>
+<style>
+/**--左侧菜单--**/
+#menu{width:100%;height:100%;background:#f2f7fb;margin:0 auto;border:1px solid #d0dded;border-top:none;}
+#menu span{display:block;width:178px;height:68px;border:1px solid #c7d9ef;background:url(__PUBLIC__/images/logo_178_68.png) repeat-x;border-left:none;border-right:none; margin:0 auto;}
+#menu ul{margin:0;padding:0;list-style:none;}
+#menu ul{margin:0;padding:0;list-style:none;}
+#menu ul.menu-sty{height:87%;margin:0 auto;overflow-x: hidden}
+#menu ul.menu-sty li.submenu{background:url(__PUBLIC__/images/F-menu.png) repeat-x;}
+#menu ul.menu-sty li a{display:block;height:20px;line-height:20px;padding-left:7px;color:#551a8b;text-decoration:none; font-size:12px;}
+#menu ul.menu-sty li a:hover{ text-decoration:underline;}
+#menu ul.menu-sty li a.menu-sty2{display:block;height:27px;font-size:14px;line-height:27px; padding-left:20px;color:#3a699f;background:url(__PUBLIC__/images/background.png) no-repeat; background-position:6px -64px; font-weight:700;cursor:pointer}
+#menu ul.menu-sty li a.t-menu{display:block;height:24px;line-height:24px;border-bottom:1px solid #e8eefa;padding-left:22px;color:#5988b4;font-size:12px; background:url(__PUBLIC__/images/background.png) no-repeat; background-position:6px -152px;}
+#menu ul.menu-sty li a.f-menu{background-position:6px -275px;}
+#menu ul.menu-sty li.submenu ul.submenu li a.item{display:block;height:20px;line-height:20px;padding-left:7px;color:#551a8b; background:#FFF;}
+#menu ul.menu-sty li a.menu-sty3{ background:url(__PUBLIC__/images/background.png) no-repeat; background-position:6px -104px;}
+.module li a{ background:#FFF;}
+.none{display: none}
+</style>
+   <div id="menu">
+	<a href="javascript:void(0);"><span>
+    </span></a>
+	<?php echo ($menu_html); ?>
+   </div>
+<script>
+//初始化加载
+$(function(){
+    // 初始化时全部隐藏
+     $("ul.submenu, .module").addClass('none');
+		
+    $("li a:not([href])").click(function(){
+    	
+        menuControl( $(this).parent(), $(this).data('hasOpen')?'close':'open' );
+        
+    }).eq(0).click();
+
+});
+</script>

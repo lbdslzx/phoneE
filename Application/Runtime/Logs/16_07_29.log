@@ -1,0 +1,6 @@
+[ 2016-07-29T15:30:40+08:00 ] 127.0.0.1 /
+INFO: [ app_begin ] --START--
+INFO: ReadHtmlCache Behavior ::run [ RunTime:0.165937s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.300844s ]
+NOTIC: [8192] mysql_connect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead F:\Source\admin\ThinkPHP\Extend\Driver\Session\SessionDb.class.php 第 100 行.
+

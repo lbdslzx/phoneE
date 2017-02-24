@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$title}</title>
+    <include file="Public:easyui_res"/>
+    <style type="text/css">
+        #buyVipLog{
+            table-layout:fixed;
+            empty-cells:show;
+            border-collapse: collapse;
+            border:1px solid #cad9ea;
+            color:#666;
+            margin-top: 5px;
+            width: 500px;
+        }
+        #buyVipLog td{
+            height:30px;
+        }
+        #buyVipLog td,.table th{
+            border:1px solid #cad9ea;
+            padding:0 1em 0;
+        }
+        #buyVipLog tr.alter{
+            background-color:#f5fafe;
+        }
+    </style>
+</head>
+<body>
+<div class="easyui-panel" title="{$title}" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/queryVipInfo" style="margin-left: 30%">
+            <table>
+                <tr>
+                    <td>手机号码：<input type="text" id="user_tel" name="user_tel" placeholder="输入手机号码"></td>
+                    <td><a href="javascript:void(0);" id="submit_search" onclick="queryVipInfo()" class="easyui-linkbutton" iconCls="icon-search" style="width:65px;height:32px">查询</a></td>
+                </tr>
+            </table>
+        </form>
+        <hr>
+        <div style="margin-top: 20px;display: none;margin-left: 20%" id="vipInfo">
+            <table id="tb_vip_info">
+                <tr>
+                    <td>用户号码：</td>
+                    <td>
+                        <span id="_tel"></span>
+                    </td>
+                    <td width="140px" style="text-align: right">是否IVR会员：</td>
+                    <td>
+                        <span id="_ivr_vip">否</span>
+                    </td>
+                    <td width="140px" style="text-align: right">会员状态：</td>
+                    <td>
+                        <span id="_gjk_vip">否</span>
+                    </td>
+                </tr>
+                <tr style="margin-top: 10px;">
+                    <td>问诊卡数：</td>
+                    <td>
+                        <span id="_coupons"></span>张
+                    </td>
+                    <td width="140px" style="text-align: right">问诊卡余额：</td>
+                    <td>
+                        <span id="_coupons_blanace"></span>币
+                    </td>
+                    <td width="140px" style="text-align: right">健康币余额：</td>
+                    <td>
+                        <span id="_coin"></span>币
+                    </td>
+                </tr>
+            </table>
+            <div style="margin-top: 20px">
+                <lable>包月记录：</lable>
+                <table id="buyVipLog">
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function queryVipInfo() {
+        $('#ff').form('submit', {
+            onSubmit: function () {
+                var user_tel = $('#user_tel').val().trim();
+                if(user_tel.length == 0){
+                    $.messager.alert('提示','请输入手机号码!');
+                    return false;
+                }
+            },
+            success: function (data) {
+                if(data == -1){
+                    $.messager.alert('提示','请输入手机号码!');
+                    return;
+                }
+                $('#vipInfo').css('display','block');
+                var _d = JSON.parse(data);
+                $('#_tel').text(_d.tel);//手机号
+                $('#_coupons').text(_d.couponsCount);//问诊卡张数
+                $('#_coupons_blanace').text(_d.couponsBalance);//问诊卡余额
+                $('#_coin').text(_d.coinBalance);//健康币余额
+
+                var vipInfo = _d.vipInfo;
+                if(vipInfo.ivr_vip == 1){
+                    $('#_ivr_vip').text('是');//IVR会员
+                }
+                if(vipInfo.gjk_vip == 1 || vipInfo.ivr_vip == 1){
+                    $('#_gjk_vip').text('VIP');
+                }else {
+                    $('#_gjk_vip').text('否');
+                }
+
+                //购买vip日志
+                var buyVipLog = _d.buyVipLog;
+                $('#buyVipLog').empty();
+                if(buyVipLog != null){
+                    var trs = '<tr><td>购买天数</td><td>来源</td><td>购买日期</td></tr>';
+                    $.each(buyVipLog,function(k,v){
+                        var vip_from = v.vip_from;
+                        var from = '贵健康购买';
+                        if(vip_from == 1){
+                            from = 'IVR会员';
+                        }
+                        trs += "<tr><td>"+ v.change_days+"</td><td>"+from+"</td><td>"+ v.log_dt+"</td></tr>";
+                    });
+                    $('#buyVipLog').append(trs);
+                }
+
+            }
+        });
+    }
+</script>
+</body>
+</html>

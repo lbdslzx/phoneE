@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文章编辑</title>
+    <include file="Public:common_res" />
+</head>
+<body>
+<div class="easyui-panel" title="{$title}" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/edit">
+            <table cellpadding="5">
+                <tr>
+                    <td>文章标题：</td>
+                    <td>
+                        <input class="easyui-textbox" id="article_title" value="{$article.article_title}" name="article_title" data-options="prompt:'请输入文章标题'" style="width:200px;height:32px"/>
+                        <input type="hidden" id="article_id" name="article_id" value="{$article.article_id}">
+                        <span style="color: red">*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>文章分类：</td>
+                    <td>
+                        <select class="easyui-combobox" id ="forum_id_lm" name="forum_id_lm" style="width:200px;height:32px;">
+                            <foreach name="forum_list" item="vo">
+                                <eq name="vo.forum_id_lm" value="$article.forum_id_lm">
+                                    <option value="{$vo.forum_id_lm}" selected="selected">{$vo.forum_name_lm}</option>
+                                <else/>
+                                    <option value="{$vo.forum_id_lm}">{$vo.forum_name_lm}</option>
+                                </eq>
+                            </foreach>
+                        </select>
+                        <span style="color: red">*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>是否置顶：</td>
+                    <td>
+                        <eq name="lm_top" value="1">
+                            <input type="radio" name="lm_top" checked value="1">是 <input type="radio" value="0" name="lm_top">否
+                        <else/>
+                            <input type="radio" name="lm_top" value="1">是 <input type="radio" value="0" checked name="lm_top">否
+                        </eq>
+                    </td>
+                </tr>
+                <tr>
+                    <td>是否加精：</td>
+                    <td>
+                        <eq name="article.is_good" value="1">
+                            <input type="radio" name="is_good" checked value="1">是 <input type="radio" value="0" name="is_good">否
+                            <else/>
+                            <input type="radio" name="is_good" value="1">是 <input type="radio" value="0" checked name="is_good">否
+                        </eq>
+                    </td>
+                </tr>
+                <tr>
+                    <td>是否推送：</td>
+                    <td>
+                        <input type="radio" name="send" value="1">是 <input type="radio" value="0" checked="checked" name="send">否
+                    </td>
+                </tr>
+                <tr>
+                    <td>标题图片：</td>
+                    <td>
+                        <div id="pic" >
+                            <img src='{$article.title_pic}'  height='100px' />
+                        </div>
+                        <input type="file" id="file" name="file" />
+                        <input type="hidden" id="title_pic" name="title_pic" value="{$article.title_pic}" />
+                        <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file');" >上传图片</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>是否跳转：</td>
+                    <td>
+                        <eq name="article.is_custom_link" value="1">
+                            <input type="radio" name="is_custom_link" checked value="1">是 <input type="radio" value="0" name="is_custom_link">否
+                            <else/>
+                            <input type="radio" name="is_custom_link" value="1">是 <input type="radio" value="0" checked name="is_custom_link">否
+                        </eq>
+                    </td>
+                </tr>
+                <tr id="link" style="display: none">
+                    <td>跳转链接：</td>
+                    <td><input type="url" class="easyui-textbox" data-options="prompt:'请输入跳转链接'" name="39_link" id="39_link" value="{$article.39_link}" style="width:800px;height:32px"></td>
+                </tr>
+                <tr id="content" style="display:none;">
+                    <td>文章内容：</td>
+                    <td>
+                        <js href="__PUBLIC__/ueditor/ueditor.config.js" />
+                        <js href="__PUBLIC__/ueditor/ueditor.all.min.js" />
+                        <script>
+                            $(function(){
+                                var ue = UE.getEditor('article_content',{
+                                    //serverUrl : "__URL__/ueditor"
+                                });
+                        })
+                        </script>
+                        <textarea  name="article_content" id="article_content"  style="width:800px;height:300px">{$article.article_content}</textarea>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div style="padding:5px 0">
+                            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-save'" style="width:100px;height:32px">保存</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    var is_link = Number({$article.is_custom_link});
+    if(is_link){
+        $("#link").show();
+    }else {
+        $("#content").show();
+    }
+    $(function () {
+        $("input[name='is_custom_link']").change(function () {
+            is_link = $("input[name='is_custom_link']:checked").val();
+            is_link = Number(is_link);
+            if(is_link){
+                $("#link").show();
+                $("#content").hide();
+            }else {
+                $("#link").hide();
+                $("#content").show();
+            }
+        });
+    });
+    function ajaxFileUpload(file_id){
+        var file_name = $("#"+file_id).val();
+        if(file_name == "" ){
+            layer.msg('请选择文件!');
+            return false;
+        }
+        if(!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(file_name)){
+            layer.msg('请上传GIF/JPG/PNG格式的图片！');
+            return false;
+        }
+        var action_url = '{$upload_addr}';
+        $.ajaxFileUpload
+        (
+                {
+                    url: action_url, //用于文件上传的服务器端请求地址
+                    type: 'post',
+                    data: { }, //此参数非常严谨，写错一个引号都不行
+                    secureuri: false, //一般设置为false
+                    fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+                    dataType: 'text', //返回值类型 一般设置为json
+                    success: function (data, status)  //服务器成功响应处理函数
+                    {
+                        data = data.replace("<pre>","");
+                        data = data.replace("</pre>","");
+                        var json = JSON.parse(data);
+                        if(json.code == 0){
+                            layer.msg("上传成功");
+                            $("#device_icon").val(json.file_name);
+                            var img_html = "<img src='{$down_addr}"+json.file_name+"/"+Math.random()+"'  height='150px' />";
+                            $("#title_pic").val("{$down_addr}"+json.file_name+"/"+Math.random());
+                            $("#pic").html(img_html);
+                        }else{
+                            layer.msg("上传失败");
+                        }
+                    },
+                    error: function (data, status, e)//服务器响应失败处理函数
+                    {
+                        alert(e);
+                    }
+                }
+        );
+        return false;
+    }
+    function submitForm(){
+        $('#ff').form('submit',{
+            onSubmit:function(){
+                var article_title = $("#article_title").val().trim();
+                if(!article_title){
+                    layer.msg('请填写文章标题!');
+                    return false;
+                }
+                is_link = $("input[name='is_custom_link']:checked").val();
+                is_link = Number(is_link);
+                if(is_link){
+                    var link = $("#39_link").val();
+                    if(link == ""){
+                        layer.msg("链接地址不能为空！");
+                        return false;
+                    }
+                    var RegUrl = /^(http:\/\/)|(https:\/\/)/;
+                    if(!RegUrl.test(link)){
+                        layer.msg('请填写有效的活动网址！格式：http://xxx.xxx.. 或 https://xxx.xxx...');
+                        return false;
+                    }
+                }
+            },
+            success:function(data){
+                if (data >0) {
+                    layer.msg("操作成功");
+                    window.location.href = "__URL__/index";
+                }else{
+                    layer.msg("操作失败,数据无变化");
+                }
+            }
+        });
+
+
+    }
+</script>
+</body>
+</html>

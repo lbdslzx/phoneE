@@ -1,0 +1,72 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/icon.css">
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+<script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/json2.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+
+</head>
+<body >
+<div class="easyui-panel" title="<?php echo ($title); ?>" style="width:100%;height: 500px">
+    <div style="padding:10px 60px 20px 60px;margin-top: 100px;text-align: center;">
+        <h1>对账报表导出</h1>
+        <form id="ff" method="post" action="" style="margin-top: 100px;">
+            <label for="hospital">挂号医院:</label>
+            <select id="hospitals" style="width:200px;height:32px;" class="easyui-combobox" name="hospitals"
+                    data-options="url:'__URL__/captainReportHospitalExportList',
+                    editable:false,
+                    valueField:'hospital_id',
+                    textField:'hospital_name',
+                    multiple:true,
+                    prompt:'-- 请选择医院 --',
+                    panelHeight:'100'">
+            </select>
+            <input type="hidden" id="hospital" name="hospital">
+            <label for="time_for">预约时间:</label>
+            <input type="datetime" value="<?php echo ($timeFor); ?>" name="time_for" id="time_for" style="width:140px;height:32px">
+            <label>至</label>
+            <input style="width:140px;height:32px" value="<?php echo ($timeTo); ?>" type="datetime" name="time_to" id="time_to">
+            <input type="button" value="导出" class="easyui-linkbutton" style="width:100px;height:32px;margin-left: 20px;">
+            <input type="submit" id="sb" style="display: none">
+        </form>
+        <div id="hint" style="margin-top: 20px;"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#time_for').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $('#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $(".easyui-linkbutton").click(function () {
+            var hospitals = $("#hospitals").combobox("getValues");
+            if(hospitals.length <= 0){
+                layer.msg("请选择医院,可多选！");
+                return;
+            }
+            var hospital = hospitals.join(",");
+            $("#hospital").val(hospital);
+            $("#sb").click();
+        });
+    })
+</script>
+</body>
+</html>

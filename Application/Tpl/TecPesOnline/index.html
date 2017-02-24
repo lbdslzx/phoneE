@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+         
+    </head>
+          <script type="text/javascript" src="__PUBLIC__/highchart/highcharts.js"></script> 
+    <body>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		
+		<form name="searchform" id="searchform" method="get" action="" >    
+		<div style="height: 30px; ">
+		pes服务器:
+		<select class="easyui-combobox" name="pes_id" id="pes_id">
+							<option value="65535" >全部</option>
+		    				<volist name="pes_info" id="vo" >
+		    				
+					<option value="{$vo.pes_id}"  >{$vo.pes_id}:{$vo.pes_desc}</option>
+					</volist>
+		    			</select>
+	    	<input class="easyui-datebox"  name="date" id="date" data-options="prompt:'请输入查询日期',value:'{$date}'" style="height:30px;"></input>
+	    	
+	        <a href="javascript:void(0);"  class="easyui-linkbutton" iconCls="icon-search" onclick="submit();"  style="width:60px;height:32px;margin-left: 10px;">查询</a>
+</div>
+ 		</form>
+ 		 
+		</div>
+	</div>
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:false,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:null,
+			toolbar:'#tb',
+			">
+		<thead>
+			<tr>
+				<volist name="table_title" id="vo"  >
+					<th data-options="field:'{$key}',align:'center',width:'10px'">{$vo}</th>
+				</volist>
+			</tr>
+		</thead>
+	</table>
+
+<script>
+$(function () {
+	var table_data = '{$table_data}';
+	table_data = JSON.parse(table_data);
+	$('#dg').datagrid('loadData',table_data);
+    $('#container').highcharts({$json});
+	var pes_id = '{$Think.get.pes_id}';
+	if(pes_id == '') pes_id = 65535;
+	$("#pes_id").combobox("setValue",pes_id);
+});
+function submit(){
+	$("#searchform").submit();
+}
+</script>
+ <div id="container" style="min-width:700px;height:400px"></div>
+ 
+    </body>
+</html>

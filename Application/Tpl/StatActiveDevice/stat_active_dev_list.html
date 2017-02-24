@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户端活跃数统计</title>
+    <include file="Public:common_res" />
+</head>
+<body>
+<div id="floating_layer" style="width: 100%;height: 100%;background-color: #ffffff;position: absolute;left: 0;top: 0;z-index: 100;"></div>
+<div id="tb" style="padding:5px 0;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto;margin-bottom: 20px;">
+            <label for="time_for">统计时间:</label>
+            <input type="datetime" value="{$timeFor}" name="time_for" id="time_for" style="width:140px;height:32px">
+            <label>至</label>
+            <input style="width:140px;height:32px" value="{$timeTo}" type="datetime" name="time_to" id="time_to">
+            <label for="province">省份:</label>
+            <select class="easyui-combobox" id="province" name="province" style="width:140px;height:32px;">
+                <option value="-1">全部</option>
+                <volist name="province" id="vo"  >
+                    <option value="{$vo.id}">{$vo.name}</option>
+                </volist>
+            </select>
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; height: 600px"  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			fitColumn:false,
+			pagination:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getNewList',
+			method:'post',
+			toolbar:'#tb',
+			pageSize: 30,
+          pageList: [15,30,50,100],
+          onLoadSuccess:total
+			">
+    <thead data-options="frozen:true">
+    <tr>
+        <th data-options="field:'stat_dt',align:'center',width:'100'">日期</th>
+    </tr>
+    </thead>
+    <thead>
+    <tr>
+        <volist name="province" id="vo"  >
+            <th data-options="field:'province_{$vo.id}',align:'center'" colspan="2">{$vo.name}</th>
+        </volist>
+    </tr>
+    <tr>
+        <volist name="province" id="vo"  >
+            <th data-options="field:'Android_{$vo.id}',align:'center',width:'100'">Android</th>
+            <th data-options="field:'IOS_{$vo.id}',align:'center',width:'100'">IOS</th>
+        </volist>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 10;
+    $("#dg").css("height",height+"px");
+    $(function () {
+        $('#time_for').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                return date <= now;
+            }
+        });
+        $('#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                return date <= now;
+            }
+        });
+    });
+    window.onload = function () {
+        $("#floating_layer").hide();
+    }
+    function total() {
+        var province = {$provinceJson};
+        var rows = $('#dg').datagrid('getRows');
+        var num = rows.length;
+        var total = new Array();
+        for (var i = 0; i < province.length; i ++){
+            var value = {'province':province[i].id,"IOS":0,"Android":0,"All":0};
+            total.push(value);
+        }
+        if(num > 1){
+            for (var i = 0; i < num-1; i ++){
+                for (var j = 0; j < total.length; j ++){
+                    var ios = rows[i]["IOS_"+total[j]['province']];
+                    var android = rows[i]["Android_"+total[j]['province']];
+                    total[j]["IOS"] = Number(total[j]["IOS"])+Number(ios);
+                    total[j]["Android"] = Number(total[j]["Android"])+Number(android);
+                    total[j]["All"] = Number(total[j]["All"])+Number(android)+Number(ios);
+                }
+            }
+        }
+        var total1 = {stat_dt:"<b>合计：</b>"};
+        var total2 = {stat_dt:"<b>总和：</b>"};
+        for(var i = 0; i < total.length; i ++){
+            var ios = Number(total[i]['IOS']);
+            var android = total[i]['Android'];
+            var all = total[i]['All'];
+            total1['IOS_'+total[i].province] = ios;
+            total1['Android_'+total[i].province] = android;
+            total2['Android_'+total[i].province] = all;
+        }
+        $('#dg').datagrid('appendRow', total1);
+        var province = rows[num-1].province;
+        for (var i = 0; i < total.length; i ++){
+            if(province != total[i].province && province != '-1'){
+                $("#dg").datagrid("hideColumn","province_"+total[i].province);
+                $("#dg").datagrid("hideColumn","IOS_"+total[i].province);
+                $("#dg").datagrid("hideColumn","Android_"+total[i].province);
+            }else {
+                $("#dg").datagrid("showColumn","province_"+total[i].province);
+                $("#dg").datagrid("showColumn","IOS_"+total[i].province);
+                $("#dg").datagrid("showColumn","Android_"+total[i].province);
+            }
+        }
+        $('#dg').datagrid('appendRow', total2);
+        var merges = new Array();
+        for (var i = 0; i < total.length; i ++){
+            var value = {field:'Android_'+total[i].province,index:num+1,colspan: 2,rowspan:1};
+            merges.push(value);
+        }
+        for (var i = 0; i < merges.length; i++) {
+            $('#dg').datagrid('mergeCells', {
+                index: merges[i].index,
+                field: merges[i].field,
+                colspan: merges[i].colspan,
+                rowspan: merges[i].rowspan
+            });
+        }
+        if(num > 0){
+            $('#dg').datagrid('deleteRow', num - 1);
+        }
+    }
+</script>
+</body>
+</html>

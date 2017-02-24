@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body>
+    <script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		<form name="searchform" method="get" action="" id ="searchform">  
+		按健康卡类型查找:  
+			<select class="easyui-combobox" name="card_type">
+							<option value="">全部</option>
+		    				<volist name="card_type" id="vo" >
+					<option value="{$key}">{$vo}</option>
+					</volist>
+		    			</select>  
+		    按渠道查找:  
+		    <select class="easyui-combobox" name="card_channel">
+							<option value="">全部</option>
+		    				<volist name="card_channel" id="vo" >
+					<option value="{$key}">{$vo}</option>
+					</volist>
+		    </select>  
+			
+	    	<input class="easyui-textbox"  name="card_batch_num" data-options="prompt:'按生产批次查找'" style="width:140px;height:32px">
+	        <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+	        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add"  style="height:32px;float: right" onclick="javascript:window.location.href='__URL__/add'">生成卡号</a>
+ 		</form>
+		</div>
+	</div>
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+		<thead>
+			<tr>
+				<volist name="table_title" id="vo"  >
+					<th data-options="field:'{$key}',align:'center',width:'10px'">{$vo}</th>
+				</volist>
+			</tr>
+		</thead>
+	</table>
+
+
+</script>
+    </body>
+</html>

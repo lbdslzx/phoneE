@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>抽奖设置</title>
+    <include file="Public:easyui_res" />
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<div class="easyui-panel"  style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/settingEdit" autocomplete="off">
+            <table cellpadding="5">
+                <tr>
+                    <td>开奖期码：</td>
+                    <td>
+                        <input type="hidden" name="lottery_id" value="{$detail.lottery_id}" id="lottery_id">
+                        <input required="required" class="form-control" name="lottery_code" id="lottery_code" value="{$detail.lottery_code}"   placeholder="请输入开奖期码" style="width:200px;height:20px"/>
+                    </td>
+                    <td>
+                        <span style="color: red">*</span>
+                        <span id="lb_lottery_code">请输入开奖起码</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>开奖标准数：</td>
+                    <td>
+                        <input type="number" required="required" class="form-control" name="cumulative_standard" id="cumulative_standard" value="{$detail.cumulative_standard}"  placeholder="下载量达到多少则开奖" style="width:200px;height:20px"/>
+                    </td>
+                    <td>
+                        <span style="color: red">*</span>
+                        <span id="lb_cumulative_standard">下载量达到多少则开奖</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>奖品名称：</td>
+                    <td>
+                        <input required="required" class="form-control" name="prize_name" id="prize_name" value="{$detail.prize_name}"  placeholder="请输入奖品名称" style="width:200px;height:20px"/>
+                    </td>
+                    <td>
+                        <span style="color: red">*</span>
+                        <span id="lb_prize_name">请输入奖品名称</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>奖品数量：</td>
+                    <td>
+                        <input type="number" required="required" class="form-control" name="prize_num" id="prize_num" value="{$detail.prize_num}"  placeholder="请输入本期有抽取几个奖" style="width:200px;height:20px"/>
+                    </td>
+                    <td>
+                        <span style="color: red">*</span>
+                        <span id="lb_prize_num">请输入本期有抽取几个奖</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>奖品图片：</td>
+                    <td colspan="2">
+                        <div id="pic" >
+                            <img src='{$detail.prize_img}'  height='200px' />
+                        </div>
+                        <input type="file" id="file" name="file" />
+                        <input type="hidden" id="prize_img" name="prize_img" value="{$detail.prize_img}" />
+                        <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file');" >上传图片</a>
+                        <span style="color: red">*</span>
+                        <span id="lb_prize_img">注：图片建议尺寸200*200px</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>开奖说明：</td>
+                    <td colspan="2">
+                        <textarea required="required" class="form-control" id="lottery_explain" name="lottery_explain" placeholder="请输入开奖说明"  style="height: 50px;width: 400px">{$detail.lottery_explain}</textarea>
+                        <br/><span style="color: red">*</span>
+                        <span id="lb_lottery_explain">请填写开奖说明&nbsp;</span>
+                        <span id="text_lottery_explain">还可以输入<strong style="color: red">200</strong>个字</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td colspan="2">
+                        <a href="javascript:void(0);" class="easyui-linkbutton"  id="save_setting" data-options="iconCls:'icon-save'" style="width:100px;height:30px">保存</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    ///form表单
+    $(function () {
+        ///开奖期码
+        var lottery_code = $("#lottery_code").val().trim();
+        var btn_lottery_code = lottery_code.length <= 0 ? false : true;
+        $("#lottery_code").change(function () {
+            var lottery_code = $(this).val().trim();
+            var lottery_id = $("#lottery_id").val().trim();
+            if(lottery_code == ''){
+                $("#lb_lottery_code").css("color","red");
+                $("#lb_lottery_code").html("请输入开启期码");
+                btn_lottery_code = false;
+            }else{
+                $("#lb_lottery_code").html("");
+                $.ajax( {
+                    url: '__URL__/getRepeatCode',
+                    type: 'post',
+                    data: {'lottery_code':lottery_code,'lottery_id':lottery_id},
+                    cache:false,
+                    dataType:'json',
+                    success: function (data){
+                        if(data.flag){
+                            $("#lb_lottery_code").css("color","red");
+                            $("#lb_lottery_code").html(lottery_code+"期号重复，请更换");
+                            $(this).val("");
+                            btn_lottery_code = false;
+                        }else {
+                            btn_lottery_code = true;
+                        }
+                    },
+                    error: function (data, status, e){
+                        layer.msg(e);
+                    }
+                });
+            }
+        });
+        ///开奖标准数
+        var cumulative_standard = $("#cumulative_standard").val().trim();
+        var btn_cumulative_standard = Number(cumulative_standard) <= 0 ? false : true;
+        $("#cumulative_standard").keyup(function () {
+            var cumulative_standard = $(this).val().trim();
+            if(Number(cumulative_standard) <= 0){
+                $("#lb_cumulative_standard").css("color","red");
+                $("#lb_cumulative_standard").html("请输入正确的开奖标准数,并且标准数不能小于0");
+                btn_cumulative_standard = false;
+            }else {
+                $("#lb_cumulative_standard").html("");
+                btn_cumulative_standard = true;
+            }
+        });
+        ///奖品名称
+        var prize_name = $("#prize_name").val().trim();
+        var btn_prize_name = prize_name == '' ? false : true;
+        $("#prize_name").keyup(function () {
+            var prize_name = $(this).val().trim();
+            if(prize_name == ""){
+                $("#lb_prize_name").css("color","red");
+                $("#lb_prize_name").html("请输入奖品名称");
+                btn_prize_name = false;
+            }else {
+                $("#lb_prize_name").html("");
+                btn_prize_name = true;
+            }
+        });
+        ///奖品数量
+        var prize_num = $("#prize_num").val().trim();
+        var btn_prize_num = Number(prize_name) <= 0 || Number(prize_num) > Number(cumulative_standard) ? false : true;
+        $("#prize_num").keyup(function () {
+            var prize_num = $(this).val().trim();
+            if(Number(prize_num)<=0){
+                $("#lb_prize_num").css("color","red");
+                $("#lb_prize_num").html("请输入正确的奖品数量");
+                btn_prize_num = false;
+            }else {
+                var cumulative_standard = $("#cumulative_standard").val().trim();
+                if(Number(cumulative_standard) < Number(prize_num)){
+                    $("#lb_prize_num").css("color","red");
+                    $("#lb_prize_num").html("奖品数量不能超过下载标准数！");
+                    btn_prize_num = false;
+                }else {
+                    $("#lb_prize_num").html("");
+                    btn_prize_num = true;
+                }
+            }
+        });
+        ///开奖说明
+        var lottery_explain = $("#lottery_explain").val();
+        var btn_lottery_explain = lottery_explain.length > 0 && lottery_explain.length <= 200 ? true : false;
+        $("#text_lottery_explain strong").html((Number(200)-lottery_explain.length));
+        $("#lottery_explain").keyup(function () {
+            lottery_explain = $(this).val();
+            $("#text_lottery_explain strong").html((Number(200)-lottery_explain.length));
+            if(Number(200)-lottery_explain.length < 0){
+                $(this).val($(this).val().substring(0,200));
+                $("#text_lottery_explain strong").html(0);
+            }
+            if(lottery_explain.length <= 0){
+                $("#lb_lottery_explain").css("color","red");
+                $("#lb_lottery_explain").html("请输入开奖说明");
+                btn_lottery_explain = false;
+            }else {
+                $("#lb_lottery_explain").html("");
+                btn_lottery_explain = true;
+            }
+        });
+        ///提交事件
+        var btn = true;
+        $("#save_setting").click(function () {
+            if(!btn) return;
+            if(!btn_lottery_code){
+                $("#lb_lottery_code").html("请输入开奖期码！");
+                $("#lb_lottery_code").css("color","red");
+            }
+            if(!btn_cumulative_standard){
+                $("#lb_cumulative_standard").css("color","red");
+                $("#lb_cumulative_standard").html("请输入正确的开奖标准数,并且标准数不能小于0");
+            }
+            if(!btn_prize_name){
+                $("#lb_prize_name").css("color","red");
+                $("#lb_prize_name").html("请输入奖品名称");
+            }
+            if(!btn_prize_num){
+                $("#lb_prize_num").css("color","red");
+                $("#lb_prize_num").html("请输入正确的奖品数量");
+            }
+            if(!btn_lottery_explain){
+                $("#lb_lottery_explain").css("color","red");
+                $("#lb_lottery_explain").html("请输入开奖说明");
+            }
+            ///开奖图片
+            var prize_img = $("#prize_img").val().trim();
+            if(prize_img.length <= 0){
+                $("#lb_prize_img").css("color","red");
+                $("#lb_prize_img").html("请选择图片");
+                return;
+            }
+            if(btn && btn_lottery_code && btn_cumulative_standard && btn_prize_name && btn_prize_num && btn_lottery_explain){
+                btn = false;
+                $('#ff').form('submit',{
+                    onSubmit:function(){
+                    },
+                    success:function(data){
+                        if (data >0) {
+                            layer.msg("操作成功");
+                            parent.window.location.href = "__URL__/setting";
+                            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                            parent.layer.close(index);
+                        }else{
+                            btn = true;
+                            layer.msg("操作失败,数据无变化");
+                        }
+                    }
+                })
+            }
+        });
+    });
+    ///图片上传
+    function ajaxFileUpload(file_id){
+        var file_name = $("#"+file_id).val();
+        if(file_name == ''){
+            layer.msg("请选择图片！");
+            return;
+        }
+        if(!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(file_name)){
+            layer.msg('请上传GIF/JPG/PNG格式的图片！');
+            return false;
+        }
+        var action_url = '{$upload_addr}';
+        $.ajaxFileUpload({
+            url:action_url,//用于文件上传的服务器端请求地址
+            type:'post',
+            data: { }, //此参数非常严谨，写错一个引号都不行
+            secureuri: false, //一般设置为false
+            fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+            dataType: 'text', //返回值类型 一般设置为json
+            success: function (data, status){
+                data = data.replace("<pre>","");
+                data = data.replace("</pre>","");
+                var json = JSON.parse(data);
+                if(json.code == 0){
+                    layer.msg("上传成功");
+                    $("#device_icon").val(json.file_name);
+                    var img_html = "<img src='{$down_addr}"+json.file_name+"/"+Math.random()+"'  height='150px' />";
+                    $("#prize_img").val("{$down_addr}"+json.file_name+"/"+Math.random());
+                    $("#pic").html(img_html);
+                }else{
+                    layer.msg("上传失败");
+                }
+            }
+        });
+        return false;
+    }
+</script>
+</body>
+</html>

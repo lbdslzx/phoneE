@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		
+		<form name="searchform" method="get" action="" id ="searchform">    
+	    	<div style="height: 30px;">
+	    	<input class="easyui-datebox" id="recommend_begin_dt" name="begin_dt" data-options="prompt:'请选择日志开始时间'" style="height:30px;"></input>
+	    	<input class="easyui-datebox" id="recommend_begin_dt" name="end_dt" data-options="prompt:'请选择日志结束时间'"  style="height:30px;margin-left: 30px"></input>
+	        <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px;margin-left: 10px;">查询</a>
+</div>
+ 		</form>
+ 		
+		</div>
+	</div>
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+		<thead>
+			<tr>
+				<volist name="table_title" id="vo"  >
+					<th data-options="field:'{$key}',align:'center',width:'10px'">{$vo}</th>
+				</volist>
+			</tr>
+		</thead>
+	</table>
+
+
+</script>
+    </body>
+</html>

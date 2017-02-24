@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <link href="__PUBLIC__/css/console.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="__PUBLIC__/js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/permission.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/validate.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/md5.js"></script>
+		<load href ="__PUBLIC__/js/json2.js" />
+        <script type="text/javascript">
+        
+            //验证ip地址的格式，有效的IPv4地址返回true，否则false.
+            function validIp(ipStr) {
+                var regip = /^(([0-1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([0-1]?\d{1,2}|2[0-4]\d|25[0-5])$/;	//验证ip地址的正则表达式。
+                var flag = regip.test(ipStr);
+                return flag;
+            }
+            function save(per) {
+
+                var limit_login_ip = $("#limit_login_ip").val();
+
+                if (limit_login_ip == "" || limit_login_ip == undefined)
+                    limit_login_ip = "0.0.0.0";
+                else if ((!validIp(limit_login_ip)) && limit_login_ip != "0.0.0.0") {
+                    $("#lblMsg").html("您输入的IP地址可能是无效的，有效IP地址实例：127.0.0.1");
+                    return;
+                }
+                var login_name = encodeURIComponent($("#login_name").val());
+                var admin_name = encodeURIComponent($("#admin_name").val());
+                if (admin_name == "") {
+                    alert("管理员不能为空！");
+                    return;
+                }
+                var password = encodeURIComponent($("#password").val());
+                if (password != "") {
+                    if(!confirm("你确定要修改管理员密码?")){
+                    	return;	
+                    }
+                }
+                var jsonObj = new Object();
+                jsonObj["admin_level"] = per;
+                jsonObj["login_name"] = login_name;       
+                jsonObj["admin_name"] = admin_name;       
+                jsonObj["limit_login_ip"] = limit_login_ip;
+                jsonObj["password"] = password;
+                var json = JSON.stringify(jsonObj);
+                var whobj = new Object();
+                whobj['admin_id'] ={$admin_id};
+                var whjson = JSON.stringify(whobj);
+                $.post("__URL__/editAdmin/"+Math.random(), "whjson="+whjson+"&json="+json, function(data) {
+                	if(data>=0){
+                		$("#lblMsg").html("操作成功");	
+                	}else{
+                		$("#lblMsg").html("操作失败");
+                	}
+                    
+                });
+            }
+            function sel(obj) {
+                if (obj.checked) {
+                    var attr = $("#permissionDiv").find("input");
+                    for (var i = 0; i <= attr.length; i++) {
+                        if (attr[i] != undefined || attr[i] != null)
+                            attr[i].checked = true;
+                    }
+                } else {
+                    var attr = $("#permissionDiv").find("input");
+                    for (var i = 0; i <= attr.length; i++) {
+                        if (attr[i] != undefined || attr[i] != null)
+                            attr[i].checked = false;
+                    }
+
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="system"> 
+            <span class="bg">编辑管理员</span> 
+        </div>
+        <div class="form-s1">
+            <form name="form1"  class="form1 form2">
+                <div class="sys-name clear-div">
+                    登录名：<input class="input-text" readonly type="text" id="login_name" value="{$login_name}" />&nbsp;&nbsp;* 不允许修改！
+                </div>
+                <div class="sys-name clear-div">
+                    管理员：<input class="input-text" name="admin_name" type="text" id="admin_name"  value="{$admin_name}" />
+                </div>
+                <div class="sys-name clear-div" style="display: none">
+                    允许IP：<input class="input-text" type="text" id="limit_login_ip" name="limit_login_ip" value="{$limit_login_ip}" />
+                </div>
+                 <div class="sys-name clear-div">
+                   密码：<input class="input-text" name="password" type="password" id="password"  value="" />&nbsp;&nbsp;* 不修改则不填写！
+                </div>
+                <div class="sys-name clear-div">
+                    <input type="checkbox" class="chkfloat" id="superManager" onClick="sel(this)"><label for="superManager">超级管理员</label>
+                </div>
+                <div class="sys-name clear-div he-s1">			
+                    <input class="buton-s bg"  id="saveButton" type="button" value="保存" onclick="javascript:save(getPermission());">
+                    <input class="buton-s bg"  type="button" value="返回列表" onclick="window.location.href = '__URL__/listAdmin'">
+                    <input  class="input-text" type="hidden" id="session" value="{$admin_level}"/>
+                    <input  class="input-text" type="hidden" id="rights_flag" value="super"/>
+                </div>
+                <div id="lblMsg" class="clear-div"></div>
+            </form>
+            <input type="hidden" id="admin_level" value="{$admin_level}">
+            <div id="permissionDiv">
+{$html}
+
+            </div>
+        </div>
+    </body>
+</html>

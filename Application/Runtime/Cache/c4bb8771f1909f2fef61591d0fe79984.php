@@ -1,0 +1,31 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ 
+   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  
+  
+</head>
+<body>
+ <style type="text/css">
+.tip-target {
+background:none repeat scroll 0 0 #DFE8F6;
+border:1px dotted #99BBE8;
+color:#15428B;
+cursor:default;
+float:left;
+font:bold 12px tahoma,arial,sans-serif;
+margin:10px;
+padding:5px 5px;
+text-align:center;
+width:auto;
+}
+	</style>
+   <div id="tipMsg"  class="tip-target">
+	<div>
+      <span>您好，</span>
+	  <span>欢迎使用贵健康管理系统！</span>
+	</div>
+   </div>
+</body>
+</html>

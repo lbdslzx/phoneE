@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消息编辑</title>
+    <include file="Public:easyui_res" />
+    <load href="__PUBLIC__/minicolors/jquery.minicolors.css" />
+    <load href="__PUBLIC__/minicolors/jquery.minicolors.min.js" />
+</head>
+<body>
+<div class="easyui-panel" title="编辑" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/edit">
+            <table cellpadding="10%">
+                <tr>
+                    <td width="60">消息标题：</td>
+                    <td>{$detail.message_title}</td>
+                </tr>
+                <tr>
+                    <td>推送类型：</td>
+                    <td>{$detail.phone_num}</td>
+                </tr>
+                <tr>
+                    <td>标签预览：</td>
+                    <td><div id="preview" style="width: 100px; height: 24px; background-color: {$detail.lable_color}; border: 1px solid #c3c3c3;text-align: center;line-height: 24px;font-weight: bold;color: #ffffff">{$detail.lable_name}</div></td>
+                </tr>
+                <tr>
+                    <td>消息摘要：</td>
+                    <td>{$detail.message_abstract}</td>
+                </tr>
+                <tr>
+                    <td>消息内容：</td>
+                    <td>{$detail.message_details}</td>
+                </tr>
+                <eq name="detail.action_state" value="1">
+                    <tr>
+                        <td>链接类型：</td>
+                        <td>{$detail.action}</td>
+                    </tr>
+                    <tr>
+                        <td>链接地址：</td>
+                        <td>{$detail.url}</td>
+                    </tr>
+                    <tr>
+                        <td>链接时效：</td>
+                        <td>{$detail.valid_dt}</td>
+                    </tr>
+                </eq>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:30px" onclick="javascript:window.location.href='__URL__/index'">返回</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

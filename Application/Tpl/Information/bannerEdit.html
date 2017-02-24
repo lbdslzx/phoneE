@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$title}</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div class="easyui-panel" title="{$title}" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/bannerEdit">
+            <table cellpadding="5">
+                <tr>
+                    <td align="right">标题：</td>
+                    <td>
+                        <input class="easyui-textbox" id="banner_title" value="{$detail.banner_title}" name="banner_title" data-options="prompt:'请输入标题'" style="width:200px;height:32px"/>
+                        <input type="hidden" id="banner_id" name="banner_id" value="{$detail.banner_id}">
+                        <span style="color: red">*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>所属栏目：</td>
+                    <td>
+                        <select class="easyui-combobox" id ="banner_forum_id" name="banner_forum_id" style="width:200px;height:32px;">
+                            <foreach name="forum_list" item="vo">
+                                <eq name="vo.forum_id_lm" value="$detail.banner_forum_id">
+                                    <option value="{$vo.forum_id_lm}" selected="selected">{$vo.forum_name_lm}</option>
+                                    <else/>
+                                    <option value="{$vo.forum_id_lm}">{$vo.forum_name_lm}</option>
+                                </eq>
+                            </foreach>
+                        </select>
+                        <span style="color: red">*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">图片：</td>
+                    <td>
+                        <div id="pic" >
+                            <img src='{$detail.banner_pic_url}'  height='200px' />
+                        </div>
+                        <input type="file" id="file" name="file" />
+                        <input type="hidden" id="banner_pic_url" name="banner_pic_url" value="{$detail.banner_pic_url}" />
+                        <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file');" >上传图片</a>
+                        <span style="color: red">*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>跳转链接：</td>
+                    <td>
+                        <input class="easyui-textbox" id="banner_web_url" value="{$detail.banner_web_url}" name="banner_web_url" data-options="validType:'url',multiline:true,prompt:'请输入跳转链接'" style="width:200px;height:32px"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>优先权重：</td>
+                    <td>
+                        <input class="easyui-textbox" id="banner_order_id" value="{$detail.banner_order_id}" name="banner_order_id" data-options="prompt:'请输入权重'" style="width:200px;height:32px"/>
+                        <span>注：大 > 小</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div style="padding:5px 0">
+                            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-save'" style="width:100px;height:32px">保存</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/banner'">返回</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    function ajaxFileUpload(file_id){
+        var file_name = $("#"+file_id).val();
+        if(file_name == "" ){
+            $.messager.alert('提示','请选择图片!');
+            return false;
+        }
+        var action_url = '{$upload_addr}';
+        $.ajaxFileUpload
+        (
+                {
+                    url: action_url, //用于文件上传的服务器端请求地址
+                    type: 'post',
+                    data: { }, //此参数非常严谨，写错一个引号都不行
+                    secureuri: false, //一般设置为false
+                    fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+                    dataType: 'text', //返回值类型 一般设置为json
+                    success: function (data, status)  //服务器成功响应处理函数
+                    {
+                        data = data.replace("<pre>","");
+                        data = data.replace("</pre>","");
+                        var json = JSON.parse(data);
+                        if(json.code == 0){
+                            $.messager.alert('提示',"上传成功");
+                            $("#device_icon").val(json.file_name);
+                            var img_html = "<img src='{$down_addr}"+json.file_name+"/"+Math.random()+"'  height='150px' />";
+                            $("#banner_pic_url").val("{$down_addr}"+json.file_name+"/"+Math.random());
+                            $("#pic").html(img_html);
+                        }else{
+                            $.messager.alert('提示',"上传失败");
+                        }
+                    },
+                    error: function (data, status, e)//服务器响应失败处理函数
+                    {
+                        alert(e);
+                    }
+                }
+        );
+        return false;
+    }
+    function submitForm(){
+        $('#ff').form('submit',{
+            onSubmit:function(){
+                var order_id = $("#banner_order_id").val().trim();
+                if(isNaN(order_id)){
+                    $.messager.alert('提示','权重只能输入数字!');
+                    return false;
+                }
+                var img = $("#banner_pic_url").val().trim();
+                if(!img){
+                    $.messager.alert('提示','请先上传图片!');
+                    return false;
+                }
+                var title = $("#banner_title").val().trim();
+                if(!title){
+                    $.messager.alert('提示','请填写问诊标题！');
+                    return false;
+                }
+
+            },
+            success:function(data){
+                if (data >0) {
+                    $.messager.alert("提示","操作成功");
+                    window.location.href = "__URL__/banner";
+//		            	 setTimeout($("#return").click(),5000);
+                }else{
+                    $.messager.alert("提示","操作失败,数据无变化");
+                }
+            }
+        });
+
+
+    }
+</script>
+</body>
+</html>

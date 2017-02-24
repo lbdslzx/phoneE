@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>对账报表</title>
+    <include file="Public:common_res" />
+    <style>
+        .nav_tabs{
+            width: 100%;
+            height: 32px;
+            border-bottom: 1px solid #95B8E7;
+            margin: 0px;
+            padding: 0px;
+            line-height: 32px;
+        }
+        .nav_tabs li{
+            float: left;
+            list-style-type: none;
+            height: 32px;
+            padding: 0 20px;
+            border-top: 1px solid #95B8E7;
+            border-right: 1px solid #95B8E7;
+            border-bottom: none;
+            cursor:pointer
+        }
+        .nav_tabs li:active,.nav_tabs li.active{
+            background: #95B8E7;
+            font-weight: bold;
+        }
+        .calendar-disabled{background: #eeeeee;color: #666666;border-radius: 0px}
+        #b_matching{
+            width: 700px;
+            height: 450px;
+            max-height: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            /*line-height: 24px;*/
+        }
+        #b_matching .content{
+            border: 1px solid #95B8E7;
+            margin: 10px;
+        }
+        #b_matching .main{
+            width: 680px;
+            height: 380px;
+        }
+        #b_matching .main .left{
+            width: 300px;
+            height: 100%;
+            overflow: hidden;
+            float: left;
+            margin: 0 10px;
+        }
+        #b_matching .main .left .order{
+            width: 298px;
+            height: auto;
+            overflow: auto;
+            font-size: 12px;
+            border: 1px dashed #95B8E7;
+            border-radius: 3px;
+            line-height: 24px;
+        }
+        #b_matching .main .nav{
+            font-weight: bold;
+            font-size: 14px;
+            width: 100%;
+            height: 32px;
+            line-height: 32px;
+        }
+        #b_matching .main p{
+            padding: 0 10px;
+        }
+        #b_matching .main textarea{
+            width: 294px;
+            border: 1px solid #95B8E7;
+            border-radius: 3px;
+            height: 120px;
+        }
+        #b_matching .main .center{
+            float: left;
+            width: 30px;
+            height: 100%;
+        }
+        #b_matching .main .center .border{
+            margin-left: 15px;
+            margin-top: 15px;
+            border-left: 1px solid #95B8E7;
+            height: 350px ;
+        }
+        #b_matching .main .left .b_remarks{
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        #b_matching .main .left .b_remarks .box{
+            width: 320px;
+            height: 320px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        #b_matching .main .left .b_remarks .box .items{
+            width: 100%;
+            height: auto;
+            line-height: 24px;
+            margin-bottom: 5px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item{
+            width: 100%;
+            height: auto;
+            float: left;
+        }
+        #b_matching .main .left .b_remarks .box .items .item_hr{
+            min-height: 0;
+            height: 1px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item .item_lib{
+            height: auto;
+            width: 40px;
+            float: left;
+            font-size: 12px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item .item_words{
+            height: auto;
+            width: 260px;
+            float: left;
+            font-size: 12px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item .time{
+            float: left;
+            font-size: 10px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item .author{
+            float: right;
+            font-size: 10px;
+            padding-right: 24px;
+        }
+        #b_matching .main .left .b_remarks .box .items .item .hr{
+            border-top: 1px dashed #95B8E7;
+            height: 1px;
+        }
+        #b_matching .btn{
+            width: 680px;
+            height: 50px;
+        }
+        #b_matching .btn .left{
+            width: 50%;
+            height: 100%;
+            float: left;
+        }
+        #b_matching .btn .left .box{
+            width: auto;
+            padding: 0 20px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="tb" style="padding:5px 0;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto;margin-bottom: 20px;">
+            <label for="time_for">时间范围:</label>
+            <select class="easyui-combobox" id ="time_frame" name="time_frame" style="width:140px;height:32px;">
+                <option value="2" selected="selected">预约时间</option>
+            </select>
+            <input type="datetime" value="{$timeFor}" name="time_for" id="time_for" style="width:140px;height:32px">
+            <label>至</label>
+            <input style="width:140px;height:32px" value="{$timeTo}" type="datetime" name="time_to" id="time_to"><br/><br/>
+            <label for="match_state">匹配状态:</label>
+            <select class="easyui-combobox" id="match_state" name="match_state" style="width:140px;height:32px;">
+                <option value="">全部</option>
+                <option value="0,3">未匹配</option>
+                <option value="1">系统匹配</option>
+                <option value="2">人工匹配</option>
+            </select>
+            <label for="hospital">挂号医院:</label>
+            <select class="easyui-combobox" id="hospital" name="hospital" style="width:140px;height:32px;">
+                <volist name="hospital" id="vo"  >
+                    <option value="{$vo.hospital_id}">{$vo.hospital_name}</option>
+                </volist>
+            </select>
+            <input type="hidden" name="captain" id="captain" value="1,2">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+    <ul class="nav_tabs">
+        <li class="active" data-captain="1,2">已匹配（<strong>0</strong>）</li>
+        <li data-captain="0,3">未匹配（<strong>0</strong>）</li>
+    </ul>
+</div>
+<table id="dg"  style="width:100%; min-height: 600px"  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			fitColumn:false,
+			pagination:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getOrderCaptainReportList',
+			method:'post',
+			toolbar:'#tb',
+			pageSize: 30,
+          pageList: [30,50,100],
+          onLoadSuccess:total
+			">
+    <thead data-options="frozen:true">
+    <tr>
+        <th data-options="field:'igs_finance_rec_state',align:'center',width:'100'">匹配状态</th>
+        <th data-options="field:'order_id',align:'center',width:'100'">订单号</th>
+    </tr>
+    </thead>
+    <thead>
+    <tr>
+        <th data-options="field:'source',align:'center',width:'100'">数据来源</th>
+        <th data-options="field:'hospital',align:'center',width:'150'">挂号医院</th>
+        <th data-options="field:'department',align:'center',width:'100'">挂号科室</th>
+        <th data-options="field:'doctor',align:'center',width:'100'">挂号医生</th>
+        <th data-options="field:'reg_fee',align:'center',width:'100'">挂号费(元/￥)</th>
+        <th data-options="field:'shift_date',align:'center',width:'150'">预约时间</th>
+        <th data-options="field:'patient',align:'center',width:'100'">就诊人</th>
+        <th data-options="field:'id_card',align:'center',width:'200'">身份证</th>
+        <th data-options="field:'igs_finance_rec_dt',align:'center',width:'150'">操作时间</th>
+        <th data-options="field:'igs_finance_rec_user',align:'center',width:'100'">操作人</th>
+        <th data-options="field:'igs_finance_rec_remarks',formatter:formatRemark,align:'center',width:'200'">备注</th>
+        <th data-options="field:'opera',formatter:formatOperation,align:'center',width:'100'">操作</th>
+    </tr>
+    </thead>
+</table>
+<div style="padding:5px;height:auto;background: #F4F4F4;border: 1px solid #95B8E7;border-top: none;height: 32px;line-height: 32px;">
+    <strong>挂号费统计：</strong>
+    <span>系统匹配<strong id="sys_match" style="color:red;">0.00</strong>元,</span>
+    <span>人工匹配<strong id="atr_match" style="color:red;">0.00</strong>元,</span>
+    <span>未匹配<strong id="no_match" style="color:red;">0.00</strong>元</span>
+    <a href="javascript:void(0);" id="submit_excel" onclick="orderCaptainReportDerivedExcel()" class="easyui-linkbutton"  style="width:100px;height:32px;float: right;">导出Excel</a>
+</div>
+<div id="b_matching" style="display: none;"><div class="content">
+    <div class="main">
+        <div class="left">
+            <div class="nav">订单信息：</div>
+            <div class="order">
+                <p><span>订单号：</span><span id="b_order_id"></span></p>
+                <p><span>就诊人：</span><span id="b_patient"></span></p>
+                <p><span>身份证：</span><span id="b_id_card"></span></p>
+                <p><span>挂号费：</span><span id="b_reg_fee">0.00</span><span>元</span></p>
+            </div>
+            <div class="nav">备注：</div>
+            <textarea name="b_remarks" id="b_remarks" placeholder="请输入备注"></textarea>
+            <span style="font-size: 10px">备注最大长度100字，还能输入<strong id="b_text_num" style="color: red;">100</strong> 字.</span>
+            <input type="hidden" id="b_source" value="1">
+            <input type="hidden" id="b_igs_serial_number" value="1">
+            <input type="hidden" id="b_igs_finance_rec" value="2">
+        </div>
+        <div class="center">
+            <div class="border"></div>
+        </div>
+        <div class="left">
+            <div class="nav">备注历史:</div>
+            <div class="b_remarks">
+                <div class="box" id="b_remarks_log"></div>
+            </div>
+        </div>
+    </div>
+    <div class="btn">
+        <div class="left">
+            <div class="box" id="b_error" style="color: red;font-size: 14px;line-height: 50px;padding: 0 10px;"></div>
+        </div>
+        <div class="left">
+            <div class="box">
+                <a href="javascript:void(0);" id="b_remark_no" class="easyui-linkbutton"  style="width:60px;height:32px;float: right">取消</a>
+                <a href="javascript:void(0);" id="b_remark_save" class="easyui-linkbutton"  style="width:60px;height:32px;float: right;margin-right: 20px">保存</a>
+            </div>
+        </div>
+    </div>
+</div></div>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 60;
+    $("#dg").css("height",height+"px");
+    $('#dg').datagrid({ queryParams: form2Json("searchform") });
+    $(function () {
+        $('#time_for').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $('#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $(".nav_tabs").find("li").click(function () {
+            $(".nav_tabs").find("li").removeClass("active");
+            $(this).addClass("active");
+            var captain = $(this).attr("data-captain");
+            $("#captain").val(captain);
+            $('#dg').datagrid({ queryParams: form2Json("searchform") });
+        });
+        $("#b_remarks").keyup(function () {
+            var reason = $(this).val();
+            var length = 100 - reason.length;
+            length = length < 0 ? 0 : length;
+            $("#b_text_num").html(length);
+            if(reason.length > 100){
+                $(this).val($(this).val().substring(0,100));
+            }
+        });
+        $("#b_remark_save").click(function () {
+            var remark = $("#b_remarks").val();
+            var source = $("#b_source").val();
+            var igsSerialNumber = $("#b_igs_serial_number").val();
+            var igsFinanceRec   = $("#b_igs_finance_rec").val();
+            if(remark.length < 1){
+                $("#b_error").html("请填写备注！");
+                return;
+            }
+            $.ajax({
+                url: '__URL__/captainArtificialMatching',
+                type: 'post',
+                data: {'igsSerialNumber': igsSerialNumber, 'source': source,"remark":remark,"igsFinanceRec":igsFinanceRec},
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    if(data>0){
+                        layer.msg("操作成功");
+                        layer.closeAll();
+                        $("#b_remarks").val("");
+                        $("#b_error").html("");
+                        $('#dg').datagrid({queryParams: form2Json("searchform")});
+                    }else {
+                        layer.msg("操作失败");
+                    }
+                },
+                error: function () {
+                    layer.msg("操作异常");
+                }
+            });
+        });
+        $("#b_remark_no").click(function () {
+            layer.closeAll();
+        });
+    });
+    function formatOperation(val,row) {
+        switch (row.igs_finance_rec_id){
+            case "0":
+                return "<a href='javascript:void(0);' onclick='artificialMatching(\""+row.reg_fee+"\",\""+row.order_id+"\",\""+row.id_card+"\",\""+row.patient+"\",\""+row.igs_serial_number+"\","+row.source_id+",1)'>确认匹配</a>";
+            case "2":
+                return "<a href='javascript:void(0);' onclick='artificialMatching(\""+row.reg_fee+"\",\""+row.order_id+"\",\""+row.id_card+"\",\""+row.patient+"\",\""+row.igs_serial_number+"\","+row.source_id+",2)'>撤销匹配</a>";
+            case "3":
+                return "<a href='javascript:void(0);' onclick='artificialMatching(\""+row.reg_fee+"\",\""+row.order_id+"\",\""+row.id_card+"\",\""+row.patient+"\",\""+row.igs_serial_number+"\","+row.source_id+",1)'>确认匹配</a>";
+            default:
+                return "";
+        }
+    }
+    function formatRemark(val) {
+        return "<a title='"+val+"'>"+val+"</a>";
+    }
+    function artificialMatching(regFee,orderId,idCard,patient,igsSerialNumber,source,type) {
+        $("#b_order_id").html(orderId);
+        $("#b_patient").html(patient);
+        $("#b_id_card").html(idCard);
+        $("#b_reg_fee").html(regFee);
+        $("#b_source").val(source);
+        $("#b_text_num").html(100);
+        $("#b_igs_serial_number").val(igsSerialNumber);
+        $("#b_remarks").val("");
+        $("#b_error").html("");
+        if(type==1){
+            $("#b_remarks").attr("placeholder","请填写匹配原因");
+            $("#b_igs_finance_rec").val(2);
+        }else {
+            $("#b_remarks").attr("placeholder","请填写撤销匹配原因");
+            $("#b_igs_finance_rec").val(3);
+        }
+        $("#b_remarks_log").html("");
+        $.ajax({
+            url: '__URL__/captainArtificialMatchingLog',
+            type: 'post',
+            data: {'igsSerialNumber': igsSerialNumber,'source':source},
+            cache: false,
+            dataType: 'json',
+            success: function (data) {
+                var div = "";
+                $("#b_remarks_log").html(div);
+                div += '<div class="items">';
+                div += '<div class="item">';
+                div += '<div class="item_lib">操作：</div>';
+                div += '<div class="item_words">'+data.list.igs_finance_rec_state+'</div>';
+                div += '</div>';
+                div += '<div class="item">';
+                div += '<div class="item_lib">备注：</div>';
+                div += '<div class="item_words">'+data.list.igs_finance_rec_remarks+'</div>';
+                div += '</div>';
+                div += '<div class="item">';
+                div += '<div class="time">'+data.list.igs_finance_rec_dt+'</div>';
+                div += '<div class="author">'+data.list.igs_finance_rec_user+'</div>';
+                div += '</div>';
+                div += '<div class="item item_hr">';
+                div += '<div class="hr">&nbsp;</div>';
+                div += '</div>';
+                div += '</div>';
+                var list = data.log;
+                for(var i = 0; i < list.length; i ++){
+                    div += '<div class="items">';
+                    div += '<div class="item">';
+                    div += '<div class="item_lib">操作：</div>';
+                    div += '<div class="item_words">'+list[i].igs_finance_rec_state+'</div>';
+                    div += '</div>';
+                    div += '<div class="item">';
+                    div += '<div class="item_lib">备注：</div>';
+                    div += '<div class="item_words">'+list[i].igs_finance_rec_remarks+'</div>';
+                    div += '</div>';
+                    div += '<div class="item">';
+                    div += '<div class="time">'+list[i].igs_finance_rec_dt+'</div>';
+                    div += '<div class="author">'+list[i].igs_finance_rec_user+'</div>';
+                    div += '</div>';
+                    div += '<div class="item">';
+                    div += '<div class="hr">&nbsp;</div>';
+                    div += '</div>';
+                    div += '</div>';
+                }
+                $("#b_remarks_log").html(div);
+            },
+            error: function () {
+
+            }
+        });
+        var title = type == 1 ? "确认匹配" : "撤销匹配";
+        bombBoxDiv($("#b_matching"),title,"700px","500px");
+    }
+    function total() {
+        var rows = $('#dg').datagrid('getRows');
+        var num = rows.length;
+        var captain = rows[num-1].captain;
+        $(".nav_tabs").find("li").eq(0).find("strong").html(Number(rows[num-1].match_num));
+        $(".nav_tabs").find("li").eq(1).find("strong").html(Number(rows[num-1].no_match_num));
+        if(captain == "1,2") {
+            //$("#dg").datagrid("hideColumn","opera");
+            $("#dg").datagrid("hideColumn","source");
+        }else {
+            //$("#dg").datagrid("showColumn","opera");
+            $("#dg").datagrid("showColumn","source");
+        }
+        var sys_match = "0.00";
+        var atr_match = "0.00";
+        var no_match = "0.00";
+        if (num >= 1) {
+            var total = num - 1;
+            sys_match = Number(rows[total].sys_match).toFixed(2);
+            atr_match = Number(rows[total].atr_match).toFixed(2);
+            no_match = Number(rows[total].no_match).toFixed(2);
+        }
+        $("#sys_match").html(sys_match);
+        $("#atr_match").html(atr_match);
+        $("#no_match").html(no_match);
+        if(num > 0) {
+            $('#dg').datagrid('deleteRow', num - 1);
+        }
+    }
+    function orderCaptainReportDerivedExcel() {
+        var json = form2Json("searchform");
+        var url = '__URL__/orderCaptainReportDerivedExcel?';
+        for (var x in json) {
+            url = url + "&" + x + "=" + json[x];
+        }
+        location.href = url;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>订单详细信息</title>
+
+    <style type="text/CSS">
+        <!--
+        body, td, th {
+            font-size: 13px;
+            color: #000000;
+        }
+
+        body {
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-right: 0px;
+            margin-bottom: 0px;
+            background-color: #F5F7EB;
+        }
+
+        a:link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a:visited {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        a:active {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        .page a:link {
+            color: #0000FF;
+            text-decoration: none;
+        }
+
+        .page a:visited {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page a:hover {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page a:active {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page {
+            color: #0000FF;
+        }
+
+        input.buton-s {
+            height: 24px;
+            color: #FFF;
+            font-weight: 700;
+            cursor: pointer;
+            line-height: 24px;
+            margin-top: 2px;
+            float: left;
+            margin-right: 15px;
+            border: 1px solid #558ac2;
+            background: #4c9dd1;
+        }
+
+        .auto_arrange {
+            table-layout: fixed
+        }
+
+        .auto_arrange td {
+            word-wrap:break-word;
+            padding: 1px
+        }
+        .messager-icon{
+            display: none;
+        }
+        -->
+    </style>
+</head>
+<body>
+<table style="margin-top:20px;margin-bottom:10px;margin-right: 20px" border="0" align="center" cellpadding="0" cellspacing="1" class="auto_arrange" width="580px" height="100%" cellspacing="2px"
+       bgcolor="#CCCCCC">
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp; 订单ID：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$order_id}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp; 就诊医院：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$hosl_name}            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp; 就诊科室：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$dept_name}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                 &nbsp; 就诊医生：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$expert_name}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp; 门诊类型：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$clinicName}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                 &nbsp; 挂号费用：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                ¥{$reg_fee}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                 &nbsp; 就诊时间：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$shift_date}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp; 就诊人：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$patient_name} </div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp;&nbsp; 性别：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">{$patient_sex}</div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp;&nbsp; 年龄：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$patient_age}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp; 身份证：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$certificate_no}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp; 手机号：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$patient_phone}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;{$widgetId}：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$widgetValue}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">
+                &nbsp;&nbsp;&nbsp; 地址：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="center">
+                {$patient_address}
+            </div>
+        </td>
+    </tr>
+</table>
+
+
+</body>
+</html>

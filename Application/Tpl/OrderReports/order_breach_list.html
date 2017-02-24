@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户违约记录</title>
+    <include file="Public:easyui_res" />
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+    <style>
+        .calendar-disabled{background: #eeeeee;color: #666666;border-radius: 0px}
+    </style>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto;margin-bottom: 20px; line-height: 40px">
+            <label for="time_for">时间范围：</label>
+            <input type="datetime" value="{$timeFor}" name="time_for" id="time_for" style="width:140px;height:32px">
+            <label>至</label>
+            <input style="width:140px;height:32px" value="{$timeTo}" type="datetime" name="time_to" id="time_to">
+            <label for="hospital">挂号医院：</label>
+            <select class="easyui-combobox" id ="hospital" name="hospital" style="width:140px;height:32px;">
+                <option value="">全部</option>
+                <volist name="hospital" id="vo"  >
+                    <option value="{$vo.hosl_name}">{$vo.hosl_name}</option>
+                </volist>
+            </select>
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; min-height: 600px"  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getOrderBreachList',
+			method:'post',
+			toolbar:'#tb',
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'record_id',align:'center',width:'10px'">记录ID</th>
+        <th data-options="field:'user_id',align:'center',width:'10px'">违约用户ID</th>
+        <th data-options="field:'order_id',align:'center',width:'10px'">预约订单号</th>
+        <th data-options="field:'hosl_name',align:'center',width:'10px'">预约医院</th>
+        <th data-options="field:'dept_name',align:'center',width:'10px'">预约科室</th>
+        <th data-options="field:'doc_name',align:'center',width:'10px'">预约医生</th>
+        <th data-options="field:'shift_date',align:'center',width:'10px'">预约时间</th>
+        <th data-options="field:'remark',align:'center',width:'10px'">违约信息</th>
+        <th data-options="field:'insert_dt',align:'center',width:'15px'">添加时间</th>
+        <th data-options="field:'op',align:'center',width:'10px'">操作</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 20;
+    $("#dg").css("height",height+"px");
+    $(function(){
+        $('#time_for,#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $('#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+    });
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    function breachDel(id) {
+        layer.confirm("确定删除该记录？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消']
+        },function(){
+            $.ajax( {
+                url: '__URL__/orderBreachDel',
+                type: 'post',
+                data: {'record_id':id},
+                cache:false,
+                dataType:'json',
+                success: function (data){
+                    if(data > 0 ){
+                        layer.msg('已经删除！');
+                        $('#dg').datagrid({ queryParams: form2Json("searchform") });
+                    }else{
+                        layer.msg("请重新删除！");
+                    }
+                },
+                error: function (){
+                    layer.msg("删除异常");
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

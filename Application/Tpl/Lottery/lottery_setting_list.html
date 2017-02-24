@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>摇奖设置</title>
+    <include file="Public:easyui_res"/>
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px">
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id="searchform" style="height:40px;margin-bottom: 20px">
+            <label>开奖时间</label>
+            <input class="easyui-datebox" id="bt"  name="bt"  style="width:140px;height:32px"  /> 至 <input class="easyui-datebox" id="et"  name="et"  style="width:140px;height:32px" />
+            <label for="lottery_code">开奖期号：</label>
+            <input class="easyui-textbox"  type="text" id="lottery_code" name="lottery_code" data-options="prompt:'输入期号'" style="width:140px;height:32px">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search" style="width:60px;height:32px">查询</a>
+            <!--<label>当前总下载量：{$participate_sum}</label>-->
+            <a href="javascript:void(0);" onclick="settingEdit(0)" class="easyui-linkbutton" iconCls="icon-add"  style="height:32px;float: right;margin-right: 60px">添加</a>
+            <br/><br/>
+            <span><strong style="color: red">注：</strong></span>
+            <span>1. 推荐码<strong style="color: red">P</strong>开头<strong style="color: red">7</strong>位长度;</span>
+            <span>2. 抽奖码<strong style="color: red">C</strong>开头<strong style="color: red">8</strong>位长度;</span>
+            <span>3. 无人中奖抽奖码<strong style="color: red">N</strong>开头<strong style="color: red">8</strong>位长度;</span>
+            <span>4. 推荐码及抽奖码均由大写字母和数字组成。</span>
+        </form>
+    </div>
+</div>
+<table id="dg" style="width:100%;" title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getLotterySettingList',
+			method:'post',
+			toolbar:'#tb',
+			rowStyler: function(index,row){
+			    var bgColor = 'background-color:#000000';
+			    switch(row.state){
+                case '待开奖':
+                    bgColor = 'background-color:#99CCFF';
+                    break;
+                case '开奖中':
+                    bgColor = 'background-color:#99FF33;font-weight:bold;color: #ff0000';
+                    break;
+                case '已开奖':
+                    bgColor = 'background-color:#CC3300';
+                    break;
+                default:
+                    bgColor = 'background-color:#000000';
+                    break;
+                }
+                return bgColor;
+			}
+			">
+    <thead>
+    <tr>
+        <volist name="table_title" id="vo"  >
+            <th data-options="field:'{$key}',formatter:format_{$key},align:'center',width:'10px'">{$vo}</th>
+        </volist>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 20;
+    $("#dg").css("height",height+"px");
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    function format_lottery_code(val,row) {
+        return val;
+    }
+    function format_lottery_explain(val,row) {
+        return val;
+    }
+    function format_lottery_explain(val,row) {
+        return val;
+    }
+    function format_prize_name(val,row) {
+        return val;
+    }
+    function format_prize_img(val,row) {
+        return "<img src=\""+val+"\" width=\"30px\" onclick=\"view_pic('"+val+"')\" style='padding: 0px 0px;margin: 0px;' alt=\""+row.prize_name+"\">";
+    }
+    function format_cumulative_standard(val,row) {
+        return val;
+    }
+    function format_prize_num(val,row) {
+        return val;
+    }
+    function format_start_dt(val,row) {
+        return val;
+    }
+    function format_end_dt(val,row) {
+        return val;
+    }
+    function format_state(val,row) {
+        return val;
+        /*var bgColor = "#000000";
+        switch(val){
+            case "待开奖":
+                bgColor = "#0000ff";
+                break;
+            case "开奖中":
+                bgColor = "#00ff00;font-weight:bold;color: #ff0000";
+                break;
+            case "已开奖":
+                bgColor = "#ff0000";
+                break;
+            default:
+                bgColor = "#000000";
+                break;
+        }
+        return "<div style='color: #ffffff;background-color:"+bgColor+";margin: 0 auto;padding: 0px 0px'>"+val+"</div>";*/
+    }
+    function format_insert_dt(val,row) {
+        return val;
+    }
+    function format_opera(val,row) {
+        var lotteryId = row.lottery_id;
+        if(row.state == "待开奖") {
+            val = "<a href=\"javascript:void(0);\" onclick=\"settingEdit('" + lotteryId + "')\">编辑</a>";
+            val += "&nbsp;<a href='javascript:void(0);' onclick='settingDel(" + lotteryId + ")'>删除</a>";
+        }
+        return val;
+    }
+    function view_pic(url){
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            shadeClose: true,
+            area: ['auto', 'auto'],
+            content: "<img src=\""+url+"\" style='padding: 0px 0px;margin: 0px;'>"
+        });
+    }
+    function settingDel(lotteryId) {
+        layer.msg("确定删除？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消'],
+            yes: function () {
+                $.ajax({
+                    url: '__URL__/settingDel',
+                    type: 'post',
+                    data: {'lottery_id': lotteryId},
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data > 0) {
+                            layer.msg('已删除！');
+                            $('#dg').datagrid({queryParams: form2Json("searchform")});
+                        } else {
+                            layer.msg("删除失败！");
+                        }
+                    },
+                    error: function () {
+                        layer.msg("删除异常");
+                    }
+                });
+            }
+        },function () {
+            //$('#dg').datagrid({queryParams: form2Json("searchform")});
+        })
+    }
+    function settingEdit(lotteryId) {
+        layer.open({
+            type: 2,
+            title: '奖项信息',
+            fix: false,
+            shadeClose: true,
+            maxmin: false,
+            area: ['80%', '95%'],
+            content: ['__URL__/settingEdit?lottery_id='+lotteryId,'yes'],
+            end: function(){}
+        });
+    }
+</script>
+</body>
+</html>

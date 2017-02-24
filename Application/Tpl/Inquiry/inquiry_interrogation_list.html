@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>问诊量统计</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto;margin-bottom: 20px;line-height: 40px">
+            <label for="inquiry_type">查找类型:</label>
+            <select id="inquiry_type" name="inquiry_type" class="easyui-combobox" style="width:140px;height:32px;">
+                <option value="0" selected="selected">全部</option>
+                <option value="1">视频问诊</option>
+                <option value="2">电话问诊</option>
+            </select>
+            <label for="version">查找版本:</label>
+            <select id="version" name="version" class="easyui-combobox" style="width:140px;height:32px;">
+                <option value="0" selected="selected">全部</option>
+                <option value="1">贵州版</option>
+                <option value="2">全国版</option>
+            </select>
+            <label for="user_province">用户省份:</label>
+            <select id="user_province" name="user_province" class="easyui-combobox" style="width:140px;height:32px;">
+                <option value="0" selected="selected">全部</option>
+                <foreach name="province" item="vo">
+                    <option value="{$vo.id}">{$vo.name}</option>
+                </foreach>
+            </select>
+            <label for="doc_province">医生省份:</label>
+            <select id="doc_province" name="doc_province" class="easyui-combobox" style="width:140px;height:32px;">
+                <option value="0" selected="selected">全部</option>
+                <foreach name="province" item="vo">
+                    <option value="{$vo.id}">{$vo.name}</option>
+                </foreach>
+            </select>
+            <br/>
+            <label for="phone_number">主叫号码:</label>
+            <input type="text" id="phone_number" name="phone_number" class="easyui-textbox" data-options="prompt:'手机号码/主叫号码'" style="width:140px;height:32px">
+            <label for="doc_id">医生ID:</label>
+            <input type="text" id="doc_id" name="doc_id" class="easyui-textbox" data-options="prompt:'医生ID'" style="width:140px;height:32px">
+            <label for="doc_name">医生姓名:</label>
+            <input type="text" id="doc_name" name="doc_name" class="easyui-textbox" data-options="prompt:'医生姓名'" style="width:140px;height:32px">
+            <label for="doc_phone">医生电话:</label>
+            <input type="text" id="doc_phone" name="doc_phone" class="easyui-textbox" data-options="prompt:'医生手机号码/被叫号码'" style="width:140px;height:32px">
+            <label for="inquiry_id">问诊ID:</label>
+            <input type="text" id="inquiry_id" name="inquiry_id" class="easyui-textbox" data-options="prompt:'问诊ID'" style="width:140px;height:32px">
+            <br/>
+            <label for="time_for">统计时间:</label>
+            <input type="text" id="time_for" name="time_for" value="{$timeFor}" class="easyui-datetimebox" data-options="required:true,editable:false" data-options="prompt:'开始时间'"  style="width:140px;height:32px">
+            <label for="time_to">至</label>
+            <input type="text" id="time_to" name="time_to" value="{$timeTo}" class="easyui-datetimebox" data-options="required:true,editable:false" data-options="prompt:'结束时间'" style="width:140px;height:32px">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; "  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			onLoadSuccess: compute,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getInterrogationList',
+			method:'post',
+			toolbar:'#tb',
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'inquiry_id',align:'center',width:'20px'">问诊ID</th>
+        <th data-options="field:'phone_number',align:'center',width:'10px'">用户电话</th>
+        <th data-options="field:'doc_phone_number',align:'center',width:'10px'">医生电话</th>
+        <th data-options="field:'doctor',align:'center',width:'10px'">医生姓名</th>
+        <th data-options="field:'doc_id',align:'center',width:'6px'">医生ID</th>
+        <th data-options="field:'doc_pro',align:'center',width:'10px',formatter:formatProvince">医生省份</th>
+        <th data-options="field:'inquiry_type',align:'center',width:'10px'">问诊类型</th>
+        <th data-options="field:'version',align:'center',width:'10px'">问诊版本</th>
+        <th data-options="field:'province_id',align:'center',width:'10px',formatter:formatProvince">用户省份</th>
+        <th data-options="field:'inquiry_dt',align:'center',width:'15px'">呼叫时间</th>
+        <th data-options="field:'call_time',align:'center',width:'10px',formatter:formatLength">呼叫用时</th>
+        <th data-options="field:'inquiry_length',align:'center',width:'10px',formatter:formatLength">问诊时长</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    function formatProvince(val,row) {
+        var province = {$provinceJson};
+        for(var i=0; i < province.length; i ++){
+            if(val == province[i]['id']){
+                return province[i]['name'];
+            }
+        }
+    }
+    function formatLength(val,row) {
+        if(!val) return val;
+        if(row.inquiry_id == "<b>合计人数：</b>") return val;
+        if(Number(val) < 0) val = 0;
+        var hour = Math.floor(Number(val)/(60*60));
+        var minute = Math.floor((Number(val)-(hour * 60 * 60))/60);
+        var second = Number(val)%60;
+        return ""+(hour < 10 ? "0"+hour : hour )+":"+(minute < 10 ? "0"+minute : minute) + ":"+(second < 10 ? "0"+second : second);
+    }
+    function compute() {
+        var rows = $('#dg').datagrid('getRows');
+        var inquiryLength = 0;
+        var inquiry_num = rows.length;
+        for(var i = 0; i < inquiry_num; i ++){
+            inquiryLength = Number(inquiryLength) + Number(rows[i]['inquiry_length'])
+        }
+        inquiryLength = Math.floor(inquiryLength / inquiry_num);
+        $('#dg').datagrid('appendRow', { inquiry_id: '<b>平均问诊时长：</b>', inquiry_length: inquiryLength });
+        $('#dg').datagrid('appendRow', { inquiry_id: '<b>合计人数：</b>', inquiry_length: inquiry_num});
+    }
+</script>
+</body>
+</html>

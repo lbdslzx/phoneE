@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+    </head>
+    <body>
+      <div id="tb" style="padding:5px;height:auto;">
+		<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		<form name="searchform" method="get" action="" id ="searchform"> 
+		 
+		统计时间从<input class="easyui-datebox" id="begin_dt"  name="begin_dt"  data-options="required:true,editable:false" ></input>
+		
+		到<input class="easyui-datebox" id="end_dt"  name="end_dt"  data-options="required:true,editable:false" ></input> 
+	    	<input class="easyui-textbox"  name="user_id" data-options="prompt:'请输入用户ID'" style="width:170px;height:32px;margin-left: 300px;">
+    		<input class="easyui-textbox"  name="app_version_code" data-options="prompt:'客户端版本'" style="width:170px;height:32px;margin-left: 300px;">
+    		
+    		
+	        <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px;margin-left: 10px;">查询</a>
+	        
+ 		</form>
+		</div>
+	</div>
+	
+	<!-- 展示数据部分 -->
+        <table id="dg"  style="width:100%; "  title="查询结果" 
+			data-options="rownumbers:true,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+		<thead>
+			<tr>
+				<th data-options="field:'stat_dt',align:'center'" rowspan="2">统计时间</th>
+				<th data-options="field:'11',align:'center'" rowspan="2">新增注册成功数</th>
+				<th data-options="align:'center'" colspan="2">每日激活数统计</th>		
+				<th data-options="align:'center'" colspan="2">客户端每日注册成功数</th>
+				<th data-options="align:'center'" colspan="4">渠道每日注册数</th>
+				<th data-options="align:'center'" colspan="7">客户端版本每日注册成功数</th>				
+			</tr>
+			<tr>
+				<th data-options="field:'21',align:'center',height:'10%'" >激活成功</th>
+				<th data-options="field:'22',height:'10%'" >激活失败</th>		
+				
+				<th data-options="field:'31',height:'10%'" >Android</th>		
+				<th data-options="field:'32',height:'10%'" >IOS</th>	
+					
+				<th data-options="field:'41',height:'10%'" >内部测试渠道</th>		
+				<th data-options="field:'42',height:'10%'" >官网渠道</th>		
+				<th data-options="field:'43',height:'10%'" >安卓渠道</th>		
+				<th data-options="field:'44',height:'10%'" >ios渠道</th>
+				
+				<th data-options="field:'51',height:'10%'" >版本为0</th>				
+				<th data-options="field:'53',height:'10%'" >版本为1001</th>		
+				<th data-options="field:'54',height:'10%'" >版本为1002</th>
+				<th data-options="field:'56',height:'10%'" >版本为1004</th>		
+				<th data-options="field:'57',height:'10%'" >版本为1005</th>		
+				<th data-options="field:'58',height:'10%'" >版本为1006</th>		
+<!-- 				<th data-options="field:'511',height:'10%'" >版本为1009</th>
+ -->				
+ <th data-options="field:'other',height:'10%'" onclick="open();" >其他版本</th>	
+			</tr>
+		</thead>
+	</table>
+
+<script>
+function view(){
+	$('#w').window('open');
+	return false;
+}
+$(function(){
+	//设置datetime控件时间
+	var curr_time = new Date();
+//	var time = DateTimeformat(curr_time);
+	var time = new Date().Format("yyyy-MM-dd");
+	$("#end_dt").datebox("setValue",time);
+	var timestamp =Date.parse(curr_time);
+	timestamp -= 15*24*3600*1000;  
+	var new_time = new Date(timestamp); 
+	var new_time = DateTimeformat(new_time);
+	$("#begin_dt").datebox('setValue',new_time );
+//	$("#submit_search").click();
+ });
+
+</script>
+
+    </body>
+</html>

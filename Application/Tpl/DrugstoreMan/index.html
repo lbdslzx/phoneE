@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>合作药店列表</title>
+	<include file="Public:common_res" />
+</head>
+<body>
+<div id="tb" style="padding:5px 0;height:auto;">
+	<div style="margin: 10px 0 10px 10px" >
+		<!-- form表单 指定id和name之后会自动带到服务器 -->
+		<form name="searchform" method="get" action="" id ="searchform" style="height:auto;margin-bottom: 20px;">
+			<label for="pharmacy_name">药店名称:</label>
+			<input class="easyui-textbox" id="pharmacy_name"  name="pharmacy_name" data-options="prompt:'根据药店名查找'" style="width:140px;height:32px">
+			<label for="pharmacy_name">电话号码:</label>
+			<input class="easyui-textbox" id="pharmacy_tel"  name="pharmacy_tel" data-options="prompt:'根据电话号码查找'" style="width:140px;height:32px">
+			<label for="province">地区:</label>
+			<select class="easyui-combobox" id="province" name="province" style="width:140px;height:32px;">
+				<option value="-1">全部</option>
+				<volist name="province" id="vo"  >
+					<option value="{$vo.id}">{$vo.name}</option>
+				</volist>
+			</select>
+			<a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+			<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add"  style="width:60px;height:32px;margin-left:15px;" onclick="javascript:window.location.href='__URL__/edit?id=0'">添加</a>
+		</form>
+	</div>
+</div>
+<table id="dg"  style="width:100%; "  title="查询结果"
+	   data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'get',
+			toolbar:'#tb',
+			pageSize: 25,
+          pageList: [25,50,100],
+			onLoadSuccess:function(data){ loaddgSuc(data);}
+			">
+	<thead>
+	<tr>
+		<th data-options="field:'pharmacy_id',align:'center',width:'10'">序号</th>
+		<th data-options="field:'province_name',align:'center',width:'10'">地区</th>
+		<th data-options="field:'pharmacy_name',align:'center',width:'10'">药房名称</th>
+		<th data-options="field:'pharmacy_addr',align:'center',width:'10'">地址</th>
+		<th data-options="field:'pharmacy_tel',align:'center',width:'10'">电话</th>
+		<th data-options="field:'pharmacy_logo',formatter:formatLogo,align:'center',width:'10'">药店门市图片</th>
+		<th data-options="field:'count',align:'center',width:'10'">优惠信息</th>
+		<th data-options="field:'sort',formatter:formatSort,align:'center',width:'10'">排序</th>
+		<th data-options="field:'action',formatter:formatAction,align:'center',width:'10'">操作提示</th>
+	</tr>
+	</thead>
+</table>
+<script type="text/javascript">
+	var height = document.documentElement.clientHeight;
+	height = height - 20;
+	$("#dg").css("height",height+"px");
+	function formatLogo(val,row) {
+		return "<img src=\""+val+"\" width=\"30px\" onclick=\"viewPic('"+val+"')\" style='padding: 0px 0px;margin: 0px;' alt=\""+row.pharmacy_name+"\">";
+	}
+	function formatSort(val,row) {
+		return "<input id='sort_"+row.pharmacy_id+"' value='"+val+"' style='width:60px;height:20px;' onBlur=altSort('"+row.pharmacy_id+"') />";
+	}
+	function altSort(pid){
+		var v=$("#sort_"+pid).val();
+		var data={"id":v,"pharmacy_id":pid};
+		$.ajax({
+			type: "POST",
+			url: "__URL__/upSort/"+Math.random(),
+			data: data,
+			success: function(msg){
+				if(msg>0){
+					$('#dg').datagrid('reload');
+				}
+			}
+		});
+
+
+	}
+	function formatAction(val,row) {
+		//val = "<a href=\"javascript:void(0);\" onclick=\"edit('"+row.pharmacy_id+"')\">编辑</a>";
+		val = "<a href=\"__URL__/edit?id="+row.pharmacy_id+"\">编辑</a>";
+		val += "&nbsp;<a href='javascript:void(0);' onclick='del(" + row.pharmacy_id + ")'>删除</a>";
+		return val;
+	}
+	function viewPic(url) {
+		layer.open({
+			type: 1,
+			title: false,
+			closeBtn: 0,
+			shadeClose: true,
+			area: ['auto', 'auto'],
+			content: "<img src=\""+url+"\" style='padding: 0px 0px;margin: 0px;max-width: 600px;max-height: 400px'>"
+		});
+	}
+	function del(id) {
+		layer.msg("确实删除吗？",{
+			time: 10000, //10s后自动关闭
+			btn: ['确定', '取消'],
+			yes: function () {
+				$.ajax({
+					url: '__URL__/del',
+					type: 'post',
+					data: {'id': id},
+					cache: false,
+					dataType: 'json',
+					success: function (data) {
+						if (data > 0) {
+							layer.msg('已删除！');
+							$('#dg').datagrid({queryParams: form2Json("searchform")});
+						} else {
+							layer.msg("删除失败！");
+						}
+					},
+					error: function () {
+						layer.msg("删除异常");
+					}
+				});
+			}
+		})
+	}
+</script>
+</body>
+</html>

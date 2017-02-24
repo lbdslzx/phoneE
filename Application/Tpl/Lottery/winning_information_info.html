@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中奖详情</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div class="easyui-panel" title="{$title}" style="width:100%;"><div style="padding:10px 60px 20px 60px">
+    <form>
+        <table cellpadding="5">
+            <tr>
+                <td width="100">用户ID：</td>
+                <td>{$info.user_id}</td>
+            </tr>
+            <tr>
+                <td width="100">用户姓名：</td>
+                <td>{$info.user_name}</td>
+            </tr>
+            <tr>
+                <td width="100">手机号：</td>
+                <td>{$info.phone_num}</td>
+            </tr>
+            <tr>
+                <td width="100">中奖码：</td>
+                <td>{$info.draw_code}</td>
+            </tr>
+            <tr>
+                <td width="100">中奖期号：</td>
+                <td>{$info.lottery_code}</td>
+            </tr>
+            <tr>
+                <td width="100">奖品名称：</td>
+                <td>{$info.prize_name}</td>
+            </tr>
+            <tr>
+                <td width="100">奖品图片：</td>
+                <td><img src="{$info.prize_img}" style="height: 100px;border: 1px solid #c1c1c1;"></td>
+            </tr>
+            <tr>
+                <td>获奖日期：</td>
+                <td>{$info.end_dt}</td>
+            </tr>
+        </table>
+    </form>
+</div></div>
+</body>
+</html>

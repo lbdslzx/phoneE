@@ -1,0 +1,254 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?php echo ($title); ?></title>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/icon.css">
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+
+</head>
+<body>
+<div class="easyui-panel" title="<?php echo ($title); ?>" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/cardEdit">
+            <table cellpadding="5">
+                <tr>
+                    <td>优惠券ID：</td>
+                    <td><?php echo ($coupons_id); ?></td>
+                </tr>
+                <tr>
+                    <td>优惠券名称：</td>
+                    <td>
+                        <input class="easyui-textbox" id="coupons_name" value="<?php echo ($detail["coupons_name"]); ?>" name="coupons_name" data-options="prompt:'优惠券名称'" style="width:200px;height:32px"/>
+                        <input type="hidden" name="coupons_id" value="<?php echo ($detail["coupons_id"]); ?>">
+                        <input type="hidden" name="insert_dt" value="<?php echo ($detail["insert_dt"]); ?>">
+                        <input type="hidden" id="check_limit_num" name="check_limit_num" value="0">
+                        <input type="hidden" id="check_get_num" name="check_get_num" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>优惠券说明：</td>
+                    <td>
+                        <textarea class="easyui-textbox"  name="coupons_desc" id="coupons_desc" style="height: 50px;width: 300px"><?php echo ($detail["coupons_desc"]); ?></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>优惠券面额：</td>
+                    <td>
+                        <input class="easyui-textbox" id="free_coin" value="<?php echo ($detail["free_coin"]); ?>" name="free_coin" data-options="prompt:'优惠券面额'" style="width:200px;height:32px"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>每张限制使用次数：</td>
+                    <td>
+                        <input class="easyui-textbox" id="limit_num" value="<?php echo ($detail["limit_num"]); ?>" name="limit_num" data-options="prompt:'每张限制使用次数'" style="width:200px;height:32px"/>
+                        <input type="checkbox" value="100000000" id="limit_num_big">无限次
+                    </td>
+                </tr>
+                <tr>
+                    <td>可领取次数：</td>
+                    <td>
+                        <input class="easyui-textbox" id="get_num" value="<?php echo ($detail["get_num"]); ?>" name="get_num" data-options="prompt:'可领取次数'" style="width:200px;height:32px"/>
+                        <input type="checkbox" value="100000000" id="get_num_big">无限次
+                    </td>
+                </tr>
+                <tr>
+                    <td>领取类型：</td>
+                    <td>
+                        <select class="easyui-combobox" id ="get_type" name="get_type" style="width:140px;height:32px;">
+                            <option value="1" <?php if(($detail["get_type"] == 1)): ?>selected<?php endif; ?> >首次领取</option>
+                            <option value="2" <?php if(($detail["get_type"] == 2)): ?>selected<?php endif; ?>>每日领取</option>
+                            <option value="3" <?php if(($detail["get_type"] == 3)): ?>selected<?php endif; ?>>每月领取</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>优惠券有效天数：</td>
+                    <td>
+                        <input class="easyui-textbox" id="valid_dt" value="<?php echo ($detail["valid_dt"]); ?>" name="valid_dt" data-options="prompt:'优惠券有效天数'" style="width:200px;height:32px"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>权限限制：</td>
+                    <td>
+                        <?php if(($detail["per_limit"] == null)): ?><select class="easyui-combobox" id ="per_limit" name="per_limit" style="width:140px;height:32px;">
+                                <!--option value="0">贵健康用户</option>
+                                <option value="1">IVR会员</option-->
+                                <option value="2">全国版VIP</option>
+                                <option value="3">全国版非VIP</option>
+                            </select>
+                        <?php else: ?>
+                            <?php if(($detail["per_limit"] == 0)): ?>贵健康用户<?php endif; ?>
+                            <?php if(($detail["per_limit"] == 1)): ?>IVR会员<?php endif; ?>
+                            <?php if(($detail["per_limit"] == 2)): ?>全国版VIP<?php endif; ?>
+                            <?php if(($detail["per_limit"] == 3)): ?>全国版非VIP<?php endif; ?>
+                            <input type="hidden" value="<?php echo ($detail["per_limit"]); ?>" name="per_limit"><?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td>限制使用开始时间：</td>
+                    <td>
+                        <input class="easyui-datetimebox" style="height:32px;" id="limit_begin_dt"  name="limit_begin_dt" value="<?php echo ($detail["limit_begin_dt"]); ?>" data-options="required:true,editable:false"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>限制使用结束时间：</td>
+                    <td>
+                        <input class="easyui-datetimebox" style="height:32px;" id="limit_end_dt"  name="limit_end_dt" value="<?php echo ($detail["limit_end_dt"]); ?>" data-options="required:true,editable:false"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>领取开始时间：</td>
+                    <td>
+                        <input class="easyui-datetimebox" style="height:32px;" id="get_begin_dt"  name="get_begin_dt" value="<?php echo ($detail["get_begin_dt"]); ?>" data-options="required:true,editable:false" ></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>领取结束时间：</td>
+                    <td>
+                        <input class="easyui-datetimebox" style="height:32px;" id="get_end_dt"  name="get_end_dt" value="<?php echo ($detail["get_end_dt"]); ?>" data-options="required:true,editable:false" ></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div style="padding:5px 0">
+                            <a href="javascript:void(0);"  class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-save'" style="width:100px;height:32px">保存</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/cardCfg'">返回</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $("#limit_num_big").bind('click',function(){
+            var dom = document.getElementById('limit_num_big');
+            var num = 0;
+            var checked = false;
+            var v = 0;
+            if(dom.checked){
+                checked = true;
+                num = $($(this)[0]).val();
+                v = 1;
+            }
+            $("input[name='limit_num']").parent().children().val(num);
+            $("#limit_num").val(num);
+            $("input[name='limit_num']").val(num);
+            $("input[name='limit_num']").parent().children().attr('disabled',checked);
+            $('#check_limit_num').val(v);
+        });
+        $("#get_num_big").bind('click',function(){
+            var dom = document.getElementById('get_num_big');
+            var num = 0;
+            var checked = false;
+            var v = 0;
+            if(dom.checked){
+                checked = true;
+                num = $($(this)[0]).val();
+                v = 1;
+            }
+            $("input[name='get_num']").parent().children().val(num);
+            $("#get_num").val(num);
+            $("input[name='get_num']").val(num);
+            $("input[name='get_num']").parent().children().attr('disabled',checked);
+            $('#check_get_num').val(v);
+        });
+
+    });
+    function submitForm(){
+        $('#ff').form('submit',{
+            onSubmit:function(){
+                var coupons_name = $("#coupons_name").val().trim();
+                if(coupons_name.length == 0 || coupons_name.length > 20){
+                    $.messager.alert('提示','优惠券名称允许输入长度为0~20!');
+                    return false;
+                }
+
+                var coupons_desc = $("#coupons_desc").val().trim();
+                if(coupons_desc.length == 0 || coupons_desc.length > 100){
+                    $.messager.alert('提示','优惠券名称允许输入长度为0~100!');
+                    return false;
+                }
+
+                var free_coin = $("#free_coin").val().trim();
+                var r = /^[0-9]*[1-9][0-9]*$/;
+                if(!r.test(free_coin)){
+                    $.messager.alert('提示','优惠券面额必须为正整数!');
+                    return false;
+                }
+
+                var limit_num = $("#limit_num").val().trim();
+                if(!r.test(limit_num)){
+                    $.messager.alert('提示','优惠券每张限制使用次数必须为正整数!');
+                    return false;
+                }
+
+                var get_num = $("#get_num").val().trim();
+                if(!r.test(get_num)){
+                    $.messager.alert('提示','优惠券可领取次数必须为正整数!');
+                    return false;
+                }
+
+                var valid_dt = $("#valid_dt").val().trim();
+                if(!r.test(valid_dt)){
+                    $.messager.alert('提示','优惠券有效天数必须为正整数!');
+                    return false;
+                }
+
+                var limit_begin_dt = $("input[name='limit_begin_dt']").val().trim();
+                if(limit_begin_dt.length == 0){
+                    $.messager.alert('提示','请选择限制使用开始时间!');
+                    return false;
+                }
+
+                var limit_end_dt = $("input[name='limit_end_dt']").val().trim();
+                if(limit_end_dt.length == 0){
+                    $.messager.alert('提示','请选择限制使用结束时间!');
+                    return false;
+                }
+
+                if(Date.parse(limit_begin_dt) > Date.parse(limit_end_dt)){
+                    $.messager.alert('提示','限制使用结束时间必须大于限制使用开始时间!');
+                    return false;
+                }
+
+                var get_begin_dt = $("input[name='get_begin_dt']").val().trim();
+                if(get_begin_dt.length == 0){
+                    $.messager.alert('提示','请选择领取开始时间!');
+                    return false;
+                }
+
+                var get_end_dt = $("input[name='get_end_dt']").val().trim();
+                if(get_end_dt.length == 0){
+                    $.messager.alert('提示','请选择领取结束时间!');
+                    return false;
+                }
+
+                if(Date.parse(get_begin_dt) > Date.parse(get_end_dt)){
+                    $.messager.alert('提示','领取结束时间必须大于领取开始时间!');
+                    return false;
+                }
+            },
+            success:function(data){
+                console.info(data);
+                if (data !== 'false') {
+                    $.messager.alert("提示","操作成功");
+                    window.location.href = "__URL__/cardCfg";
+                }else{
+                    $.messager.alert("提示","操作失败");
+                }
+            }
+        });
+
+
+    }
+</script>
+</body>
+</html>

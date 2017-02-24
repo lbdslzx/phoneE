@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>详细信息</title>
+    
+    <style type="text/CSS">
+        <!--
+        body, td, th {
+            font-size: 13px;
+            color: #000000;
+        }
+
+        body {
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-right: 0px;
+            margin-bottom: 0px;
+            background-color: #F5F7EB;
+        }
+
+        a:link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a:visited {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        a:active {
+            text-decoration: none;
+            color: #000000;
+        }
+
+        .page a:link {
+            color: #0000FF;
+            text-decoration: none;
+        }
+
+        .page a:visited {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page a:hover {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page a:active {
+            text-decoration: none;
+            color: #0000FF;
+        }
+
+        .page {
+            color: #0000FF;
+        }
+
+        input.buton-s {
+            height: 24px;
+            color: #FFF;
+            font-weight: 700;
+            cursor: pointer;
+            line-height: 24px;
+            margin-top: 2px;
+            float: left;
+            margin-right: 15px;
+            border: 1px solid #558ac2;
+            background: #4c9dd1;
+        }
+
+        .auto_arrange {
+            table-layout: fixed
+        }
+
+        .auto_arrange td {
+            word-wrap:break-word;
+            padding: 1px
+        }
+
+        -->
+    </style>
+</head>
+<body>
+<table style="margin-top:20px;margin-bottom:10px" border="0" align="center" cellpadding="0" cellspacing="1" class="auto_arrange" width="900" cellspacing="2px"
+       bgcolor="#CCCCCC">
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px" width="150px">
+            <div align="left">
+                &nbsp; 编号：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+                {$report_id}            </div>
+        </td>
+    </tr>
+    
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 设备型号：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+               {$phone_model} </div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 操作系统版本：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">{$operate_version}</div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 客户端版本：
+            </div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+               {$app_version_code}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 用户ID：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+               {$user_id}          </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 服务器地址：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+                {$server_ip}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0" height="25px">
+            <div align="left">&nbsp; 报告时间：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left">
+               {$report_date}            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0">
+            <div align="left">&nbsp; 总内存大小：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left" style="padding: 5px;">
+                {$total_mem_size}            </div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#E0EEE0">
+            <div align="left">&nbsp; 可用内存大小：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left" style="padding: 5px;">
+                {$available_mem_size}           </div>
+        </td>
+    </tr>
+   
+    <tr>
+        <td bgcolor="#E0EEE0">
+            <div align="left">&nbsp; 异常信息：</div>
+        </td>
+        <td bgcolor="#E0EEE">
+            <div align="left" style="padding: 5px;">
+               {$stack_trace}          </div>
+        </td>
+    </tr>
+    
+    <!-- 
+    <tr>
+        <td bgcolor="#E0EEE0">&nbsp; 操作：</td>
+        <td bgcolor="#E0EEE0">
+
+                            <div style="padding-left: 50px;">
+                    <input type="button" class="buton-s" name="submit" id="op_status_1" value="接收BUG"/>
+                    <input type="button" class="buton-s" name="submit" id="op_status_2" value="处理BUG"/>
+                </div>
+                    </td>
+    </tr>
+     -->
+</table>
+
+<script>
+    $(document).ready(function () {
+        $("#op_status_1").click(function () {
+            var c = window.confirm('确定要接收BUG吗？');
+            if(c){
+                $.post('android_bug_details.php?bug_id=175692',{action:'op_status_check'},function(msg){
+                    msg = $.trim(msg);
+                    if(msg=='ok'){
+                        $("#op_status_1").val('已接收');
+                        $("#op_status_1").attr('disabled',true);
+                        alert('接收BUG成功');
+                    }else{
+                        alert('操作失败，请稍后再试');
+                    }
+                });
+            }
+        })
+
+        $("#op_status_2").click(function () {
+            var c = window.confirm('确定要处理BUG吗？');
+            if(c){
+                $.post('android_bug_details.php?bug_id=175692',{action:'op_status_pass'},function(msg){
+                    msg = $.trim(msg);
+                    if(msg=='ok'){
+                        $("#op_status_1").val('已接收');
+                        $("#op_status_2").val('已处理');
+                        $("#op_status_1").attr('disabled',true);
+                        $("#op_status_2").attr('disabled',true);
+                        alert('处理BUG成功');
+                    }else{
+                        alert('操作失败，请稍后再试');
+                    }
+                });
+            }
+        })
+    })
+</script>
+
+</body>
+</html>

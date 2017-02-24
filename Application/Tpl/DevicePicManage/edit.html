@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <include file="Public:easyui_res" />
+		<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+
+    </head>
+    <body >
+	<div class="easyui-panel" title="{$title}" style="width:100%;">
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post" action="__URL__/edit">
+	    	<table cellpadding="5">
+	    	<!-- 
+	    			<tr>
+	    			<td>设备id：</td>
+	    			<td>
+	    			<input class="easyui-numberbox" type="text" name="device_id" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		 -->
+	    		<tr>
+	    			<td>设备名称：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="device_name" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>是否官方：</td>
+	    			<td>
+		    			<select class="easyui-combobox" name="is_official">
+		    				<option value="1">是</option>
+		    				<option value="0">否</option>
+		    			</select>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>蓝牙名：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="bluetooth_name" data-options="required:true"></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+				<td>蓝牙密码：</td>
+	    			<td>	    			
+	    			<input class="easyui-textbox" type="text" name="bluetooth_password"   ></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>设备描述：</td>
+	    			<td><input class="easyui-textbox" type="text" name="device_desc"  data-options="multiline:true" style="width:300px;height:50px"></input></td>
+	    		</tr>
+	    		<tr>
+	    		
+	    		<tr>
+	    			<td>UUID：</td>
+	    			<td>
+	    			<input class="easyui-textbox" type="text" name="UUID" ></input>
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>开始版本：</td>
+	    			<td>
+			        <input class="easyui-numberbox" type="text" value="1001"  name="begin_version"  data-options="required:true" ></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>结束版本：</td>
+	    			<td>
+			        <input class="easyui-numberbox" type="text" name="end_version" value="9999"   data-options="required:true" ></input>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>设备类型：</td>
+	    			<td>
+			        <select class="easyui-combobox" name="device_type">
+		    				<volist id="vo" name="device_type" >
+		    				<option value="{$key}">{$vo}</option>
+		    				</volist>
+		    			</select>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>设备图片：</td>
+	    			<td>
+	    			<div id="pic" >
+	    			<img src='{$pic_addr}'  height='150px' />
+	    			</div>
+			        <input type="file" id="file" name="file" ></input>
+			        <input type="hidden" id="device_icon" name="device_icon" ></input>
+			        <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file');" >上传图片</a>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>适用系统：</td>
+					<td>
+		    			<select class="easyui-combobox" name="phone_os">
+		    				<option value="1">Android</option>
+		    				<option value="0">IOS</option>
+		    			</select>
+	    			</td>
+	    		</tr>
+	    		
+	    		<tr>
+	    			<td>购买地址：</td>
+	    			<td>
+			        <input class="easyui-textbox" type="text" name="buy_url" style="width: 300px;height: 60px"  data-options="validType:'url',multiline:true" ></input>
+					</td>
+	    		</tr>
+	    		
+	    		</table>
+	    		<input type="hidden" name="support_id" >
+	    	</form>
+	    		
+	    	
+
+	     <div style="padding:5px">
+	     	<a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-add'" style="width:100px;height:32px">保存</a>
+	      <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+	    </div>
+	    </div>
+	</div>
+	<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				onSubmit:function(){
+					var form_valid = $(this).form('enableValidation').form('validate');
+					if(!form_valid ){
+						return false; 
+					}
+					var pic = $("#device_icon").val()
+					if(pic == "" ){
+						$.messager.alert("提示","请上传设备图片");
+						return false; 
+					}
+				},
+				success:function(data){
+					 if (data >0) {
+		            	 $.messager.alert("提示","操作成功");
+//		            	 setTimeout($("#return").click(),5000);
+		             }else{
+		            	 $.messager.alert("提示","操作失败,数据无变化");
+		             }
+				}
+			});
+			
+		
+		}
+
+		
+		 function ajaxFileUpload(file_id){
+			 var file_name = $("#"+file_id).val();     
+				if(file_name == "" ){
+					alert('请选择文件!');
+					return false;
+				}
+			var action_url = '{$upload_addr}';
+	         $.ajaxFileUpload
+	         (
+	             {
+	                 url: action_url, //用于文件上传的服务器端请求地址
+	                 type: 'post',
+	                 data: { }, //此参数非常严谨，写错一个引号都不行
+	                 secureuri: false, //一般设置为false
+	                 fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+	                 dataType: 'text', //返回值类型 一般设置为json
+	                 success: function (data, status)  //服务器成功响应处理函数
+	                 {
+	                	data = data.replace("<pre>","");
+	                	data = data.replace("</pre>","");
+	                	var json = JSON.parse(data);
+	                	if(json.code == 0){
+	                		alert("上传成功");
+	                		$("#device_icon").val(json.file_name);
+	                		var img_html = "<img src='{$down_addr}"+json.file_name+"/"+Math.random()+"'  height='150px' />";
+	                		$("#pic").html(img_html);
+	                	}else{
+	                		alert("上传失败");
+	                	}
+	                 },
+	                 error: function (data, status, e)//服务器响应失败处理函数
+	                 {
+	                     alert(e);
+	                 }
+	             }
+	         );
+	         return false;
+	     }
+		 $(function(){
+				$('#ff').form('load', {$data});			
+			});
+	</script>
+	
+    </body>
+</html>
+

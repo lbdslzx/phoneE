@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>财务报表</title>
+    <include file="Public:easyui_res" />
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+    <style>
+        .calendar-disabled{background: #eeeeee;color: #666666;border-radius: 0px}
+    </style>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:auto; line-height: 40px">
+            <label for="time_for">应汇款日：</label>
+            <input type="datetime" value="{$timeFor}" name="time_for" id="time_for" style="width:140px;height:32px">
+            <label>至</label>
+            <input style="width:140px;height:32px" value="{$timeTo}" type="datetime" name="time_to" id="time_to">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; height: 600px;"  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:false,
+			pagination:false,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getFinancialStatementList',
+			method:'post',
+			toolbar:'#tb',
+			onLoadSuccess:total,
+			onCheckAll:onCheckAll,
+			onCheck:checkTotal,
+			onUncheck:checkTotal,
+			checkOnSelect: false,
+			selectOnCheck: false,
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'ck',checkbox:true"></th>
+        <th data-options="field:'应汇款日',align:'center',width:'10px'">应汇款日</th>
+        <th data-options="field:'昨日盈余',align:'center',width:'10px'">昨日盈余</th>
+        <th data-options="field:'昨日已支付',align:'center',width:'10px'">昨日挂号费</th>
+        <th data-options="field:'昨日已审批退款',align:'center',width:'10px'">昨日挂号费退款</th>
+        <th data-options="field:'汇款结余',align:'center',width:'10px'">汇款结余</th>
+        <th data-options="field:'应汇款',align:'center',width:'10px'">应汇款</th>
+        <th data-options="field:'state',formatter:formatState,align:'center',width:'10px'">汇款状态</th>
+        <th data-options="field:'操作',formatter:formatOperation,align:'center',width:'10px'">操作</th>
+    </tr>
+    </thead>
+</table>
+<div style="padding:5px;height:auto;background: #F4F4F4;border: 1px solid #95B8E7;border-top: none;height: auto;line-height: 32px;">
+    <div style="width: 100%;height: 32px;line-height: 32px;margin: 0 auto;border-bottom: 1px solid #95B8E7;">
+        <div style="height: 100%;width: auto;float: left;">
+            <span>应汇款(<strong id="lb_time_for">0000-00-00</strong>至<strong id="lb_time_to">0000-00-00</strong>):<strong id="lb_total_fee">0.00</strong>元</span>
+        </div>
+        <div style="height: 100%;width: auto;float: right;">
+            <span>共计<strong id="lb_total_num">0</strong>条应汇款数据 已选择<strong id="lb_selected_num">0</strong>条应汇款数据 汇款总额<strong id="lb_selected_fee">0.00</strong>元<a href="javascript:void(0);" id="remittance" onclick="remittances()" class="easyui-linkbutton" style="height: 24px;margin-bottom: 4px;margin-left: 4px;">汇款</a></span>
+        </div>
+    </div>
+    <div style="height: auto;width: 100%;font-size: 10px;line-height: 20px">
+        <span>说明：</span><br/>
+        <span>1.昨日挂号费，为线上已支付订单的统计；</span><br/>
+        <span>2.昨日挂号费退款，为已审批退款订单的统计；</span><br/>
+        <span>3.应汇款=昨日挂号费-昨日挂号费退款+汇款结余。</span>
+    </div>
+</div>
+<script type="text/javascript">
+    var remitUrl = "{$remitUrl}";
+    var statDts = "'0'";
+    var height = document.documentElement.clientHeight;
+    height = height -150;
+    $("#dg").css("height",height+"px");
+    $(function(){
+        $('#time_for,#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+        $('#time_to').datebox().datebox('calendar').calendar({
+            validator: function(date){
+                var now = new Date();
+                var d1 = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()-1);
+                return d1 <= date;
+            }
+        });
+    });
+    function formatState(val,row) {
+        if(Number(row.应汇款) <= 0){
+            return "无需汇款";
+        }else if (Number(val) == 1){
+            return "已汇款";
+        }else {
+            return "未汇款";
+        }
+    }
+    function formatOperation(val,row) {
+        if(Number(row.state) ==0 && row.应汇款 > 0 ){
+            val = "<a href='javascript:void(0);' onclick='remittance(\""+row.应汇款日+"\")'>汇款</a>"
+        }
+        return val;
+    }
+    function total(data) {
+        var length = data.rows.length;
+        var totalFee = 0;
+        var totalNum = 0;
+        for (var i = 0; i < length; i ++){
+            var fee = Number(data.rows[i]['应汇款']);
+            var state = Number(data.rows[i].state);
+            if(fee <= 0 || state == 1){
+                $("input[type='checkbox']")[i + 1].disabled = true;
+            }else {
+                totalFee = Number(totalFee) + fee;
+                totalNum += 1;
+            }
+        }
+        totalFee = Number(totalFee).toFixed(2);
+        $("#lb_total_fee").html(totalFee);
+        $("#lb_time_for").html($("input[name='time_for']").val());
+        $("#lb_time_to").html($("input[name='time_to']").val());
+        $("#lb_total_num").html(totalNum);
+        $("#lb_selected_fee").html("0.00");
+        $("#lb_selected_num").html("0");
+        $("#remittance").hide();
+    }
+    var flg = true;
+    function onCheckAll() {
+        if(flg) {
+            $("input[type='checkbox']").each(function (index, el) {
+                if (el.disabled) {
+                    $("#dg").datagrid('uncheckRow', index - 1);
+                }
+            });
+            flg = false;
+        }else {
+            $("input[type='checkbox']").each(function (index, el) {
+                $("#dg").datagrid('uncheckRow', index - 1);
+            });
+            flg = true;
+        }
+        checkTotal();
+    }
+    function remittance(statDt) {
+        window.open(remitUrl);
+        layer.msg("已汇款？",{
+            time: 60000, //10s后自动关闭
+            btn: ['是', '否'],
+            yes:function(){
+                $.ajax( {
+                    url: '__URL__/remittance',
+                    type: 'post',
+                    data: {'stat_dt':statDt},
+                    cache:false,
+                    dataType:'json',
+                    success: function (data){
+                        if(data > 0 ){
+                            layer.msg('已确定汇款！');
+                            $('#dg').datagrid({ queryParams: form2Json("searchform") });
+                        }else{
+                            layer.msg("请重新操作！");
+                        }
+                    },
+                    error: function (){
+                        layer.msg("系统异常！");
+                    }
+                });
+            }
+        });
+    }
+    function checkTotal() {
+        statDts = "'0'"
+        var data = $('#dg').datagrid('getChecked');
+        var length = data.length;
+        var selectedFee = 0;
+        if(length > 0){
+            for(var i = 0; i < length; i ++){
+                selectedFee += Number(data[i]['应汇款']);
+                statDts = statDts+",'"+data[i]['应汇款日']+"'";
+            }
+            $("#remittance").show();
+        }else {
+            $("#remittance").hide();
+        }
+        selectedFee = Number(selectedFee).toFixed(2);
+        $("#lb_selected_fee").html(selectedFee);
+        $("#lb_selected_num").html(length);
+    }
+    function remittances() {
+        window.open(remitUrl);
+        layer.msg("已汇款？",{
+            time: 60000, //10s后自动关闭
+            btn: ['是', '否'],
+            yes:function(){
+                $.ajax( {
+                    url: '__URL__/remittances',
+                    type: 'post',
+                    data: {'stat_dt':statDts},
+                    cache:false,
+                    dataType:'json',
+                    success: function (data){
+                        if(data > 0 ){
+                            layer.msg('已确定汇款！');
+                            $('#dg').datagrid({ queryParams: form2Json("searchform") });
+                        }else{
+                            layer.msg("请重新操作！");
+                        }
+                    },
+                    error: function (){
+                        layer.msg("系统异常！");
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

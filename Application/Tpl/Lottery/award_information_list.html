@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>领奖信息</title>
+    <include file="Public:easyui_res"/>
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px">
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id="searchform" style="height:20px;margin-bottom: 20px">
+            <label>领奖日期</label>
+            <input class="easyui-datebox" id="bt"  name="bt" style="width:140px;height:32px"  /> 到 <input class="easyui-datebox" id="et"  name="et"  style="width:140px;height:32px" />
+            <label for="lottery_code">抽奖期号：</label>
+            <input class="easyui-textbox"  type="text" id="lottery_code" name="lottery_code" style="width:140px;height:32px" data-options="prompt:'输入期号'">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search" style="width:60px;height:32px">查询</a>
+            <a href="javascript:void(0);" id="submit_add" onclick="awardEdit(0)" class="easyui-linkbutton" iconCls="icon-add" style="width:60px;height:32px">新增</a>
+        </form>
+    </div>
+</div>
+<table id="dg" style="width:100%; " title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getAwardList',
+			method:'post',
+			toolbar:'#tb',
+			pageSize: 25,
+          pageList: [25,50,100],
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'user_id',align:'center',width:'50px'">用户ID</th>
+        <th data-options="field:'draw_code',align:'center',width:'50px'">抽奖码</th>
+        <th data-options="field:'lottery_code',align:'center',width:'50px'">中奖期号</th>
+        <th data-options="field:'prize_intro',align:'center',width:'50px'">领奖情况说明</th>
+        <th data-options="field:'get_dt',align:'center',width:'50px'">领奖日期</th>
+        <th data-options="field:'operation',formatter:formatOperation,align:'center',width:'50px'">操作</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 20;
+    $("#dg").css("height",height+"px");
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    function formatOperation(val,row) {
+       return "<a href=\"javascript:void(0);\" onclick=\"awardEdit('"+row.draw_code+"')\">编辑</a>&nbsp;<a href=\"javascript:void(0);\" onclick=\"awardDel('"+row.draw_code+"')\">删除</a>";
+    }
+    function awardEdit(drawCode) {
+        layer.open({
+            type: 2,
+            title: '领奖信息',
+            fix: false,
+            shadeClose: true,
+            maxmin: false,
+            area: ['600px', '550px'],
+            content: ['__URL__/awardEdit/?draw_code='+drawCode,'no'],
+            end: function(){}
+        });
+    }
+    function awardDel(drawCode) {
+        layer.msg("确定删除？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消'],
+            yes: function () {
+                $.ajax({
+                    url: '__URL__/awardDel',
+                    type: 'post',
+                    data: {'draw_code': drawCode},
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data > 0) {
+                            layer.msg('已删除！');
+                            $('#dg').datagrid({queryParams: form2Json("searchform")});
+                        } else {
+                            layer.msg("删除失败！");
+                        }
+                    },
+                    error: function () {
+                        layer.msg("删除异常");
+                    }
+                });
+            }
+        },{})
+    }
+</script>
+</body>
+</html>

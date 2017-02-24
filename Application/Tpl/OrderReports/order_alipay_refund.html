@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>支付宝退款</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div id="alipay"></div>
+<script type="text/javascript">
+    $(function(){
+        var refundId = '{$refund_id}';
+        var orderId = '{$order_id}';
+        var payNo = '{$pay_no}';
+        $.ajax( {
+            url: '__URL__/orderAliPayRefund',
+            type: 'post',
+            data: {'refund_id':refundId,'order_id':orderId,'pay_no':payNo},
+            cache:false,
+            dataType:'json',
+            success: function (data){
+                $("#alipay").html(data);
+            },
+            error: function (){
+            }
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消息编辑</title>
+    <include file="Public:easyui_res" />
+    <load href="__PUBLIC__/minicolors/jquery.minicolors.css" />
+    <load href="__PUBLIC__/minicolors/jquery.minicolors.min.js" />
+</head>
+<body>
+<div class="easyui-panel" title="编辑" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/edit">
+            <table cellpadding="5">
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息接收：</td>
+                    <td>
+                        <eq name="detail.client_type" value="1"><input type="radio" name="client_type" value="1" checked="checked"><else/><input type="radio" name="client_type" value="1" ></eq> 贵州版 &nbsp;
+                        <eq name="detail.client_type" value="2"><input type="radio" name="client_type" value="2" checked="checked"><else/><input type="radio" name="client_type" value="2" ></eq> 全国版 &nbsp;
+                        <eq name="detail.client_type" value="3"><input type="radio" name="client_type" value="3" checked="checked"><else/><input type="radio" name="client_type" value="3" ></eq> 贵州版+全国版 &nbsp;
+                        <eq name="detail.client_type" value="0"><input type="radio" name="client_type" value="0" checked="checked"><else/><input type="radio" name="client_type" value="0" ></eq> 个推
+                    </td>
+                </tr>
+                <tr id="a_push" style="display: ">
+                    <td>
+                    </td>
+                    <td>
+                        <eq name="detail.is_user_id" value="1">
+                            <input type="radio" name="is_user_id" value="1" checked="checked">用户ID
+                            <input type="radio" name="is_user_id" value="0" >手机号
+                            <else/>
+                            <input type="radio" name="is_user_id" value="1" >用户ID
+                            <input type="radio" name="is_user_id" value="0" checked="checked">手机号
+                        </eq>
+                        <input class="form-control" id="phone_num" name="phone_num" value="{$detail.phone_num}" placeholder="请输入接收者用户手机号/用户ID" style="width:305px;height:30px"/>
+                        <input type="hidden" name="temp_id" value="{$detail.temp_id}" id="temp_id">
+                        <span>注：发送多位用户时，请使用半角逗号“,”分隔用户手机号/用户ID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息标题：</td>
+                    <td>
+                        <input class="form-control" name="message_title" id="message_title" value="{$detail.message_title}"  placeholder="请输入消息标题" style="width:400px;height:30px"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息类型：</td>
+                    <td>
+                        <input type="radio" name="radio_type" value="1">
+                        <select name="msg_type" class="form-control" checked="checked" style="width:177px;height:30px;">
+                            <option value="公告">公告</option>
+                            <option value="活动">活动</option>
+                            <option value="提醒">提醒</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">&nbsp;</td>
+                    <td>
+                        <input type="radio" checked="checked" name="radio_type" value="2">
+                        <label>自定义</label>
+                    </td>
+                </tr>
+                <tr class="custom">
+                    <td align="right"><span style="color: red">*</span>标签名称：</td>
+                    <td>
+                        <input class="form-control" id="custom_title" value="{$detail.lable_name}" name="lable_name"  placeholder="请输入标签名称" style="width:200px;height:30px"/>
+                    </td>
+                </tr>
+                <tr class="custom">
+                    <td align="right"><span style="color: red">*</span>标签颜色：</td>
+                    <td>
+                        <input type="text" id="custom_color" name="lable_color" value="{$detail.lable_color}" class="color form-control" data-control="brightness" style="width:155px;height:30px;float: left" value="#ffffff"/>
+                        <span style="height: 30px;line-height: 30px;">&nbsp;例：#ffffff</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">标签预览：</td>
+                    <td>
+                        <div id="preview" style="width: 100px; height: 30px; background-color: {$detail.lable_color}; border: 1px solid #c3c3c3;text-align: center;line-height: 30px;font-weight: bold;color: #ffffff">{$detail.lable_name}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息摘要：</td>
+                    <td>
+                        <textarea class="form-control" id="message_abstract" name="message_abstract" placeholder="请输入消息摘要"  style="height: 50px;width: 600px">{$detail.message_abstract}</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息内容：</td>
+                    <td>
+                        <textarea class="form-control" id="message_details" name="message_details" placeholder="请输入消息内容"  style="height: 100px;width: 600px">{$detail.message_details}</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>消息链接：</td>
+                    <td>
+                        <eq name="detail.action_state" value="1">
+                            <input type="radio" name="action_state" checked="checked" value="1">是
+                            <input type="radio" name="action_state" value="0">否
+                            <else/>
+                            <input type="radio" name="action_state" value="1">是
+                            <input type="radio" name="action_state" checked="checked" value="0">否
+                        </eq>
+                    </td>
+                </tr>
+                <eq name="detail.action_state" value="1">
+                    <tr class="link">
+                    <else/>
+                    <tr class="link" style="display: none">
+                </eq>
+                    <td align="right"><span style="color: red">*</span>链接类型：</td>
+                    <td>
+                        <eq name="detail.action" value="open_app">
+                            <input type="radio" name="action" value="open_web">URL
+                            <input type="radio" name="action" checked="checked" value="open_app">APP功能点
+                            <else/>
+                            <input type="radio" name="action" checked="checked" value="open_web">URL
+                            <input type="radio" name="action" value="open_app">APP功能点
+                        </eq>
+                    </td>
+                </tr>
+                <eq name="detail.action_state" value="1">
+                    <tr class="link">
+                        <else/>
+                    <tr class="link" style="display: none">
+                </eq>
+                    <td align="right"><span style="color: red">*</span>&nbsp;</td>
+                    <td>
+                        <input class="form-control" name="url" value="{$detail.url}"  placeholder="请输入链接地址" style="width:400px;height:30px"/>
+                        <span>格式：http://xxx.xxx.. 或 https://xxx.xxx...</span>
+                    </td>
+                </tr>
+                <eq name="detail.action_state" value="1">
+                    <tr class="link">
+                        <else/>
+                    <tr class="link" style="display: none">
+                </eq>
+                    <td align="right"><span style="color: red">*</span>链接时效：</td>
+                    <td>
+                        <input type="hidden" name="send" value="0">
+                        <input class="easyui-datetimebox" style="width:200px;height:30px" id="valid_dt"  name="valid_dt" value="{$detail.valid_dt}" data-options="required:true,editable:false" />
+                        <span>例:2016-01-20 16:12:12</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div style="padding:5px 0">
+                            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="saveNews()" data-options="iconCls:'icon-save'" style="width:100px;height:30px">保存</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="sendNews()" data-options="iconCls:'icon-redo'" style="width:100px;height:30px">发送</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:30px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready( function() {
+        $('.color').each( function() {
+            $(this).minicolors({
+                control: $(this).attr('data-control') || 'hue',
+                defaultValue: $(this).attr('data-defaultValue') || '',
+                inline: $(this).attr('data-inline') === 'true',
+                letterCase: $(this).attr('data-letterCase') || 'lowercase',
+                opacity: $(this).attr('data-opacity'),
+                position: $(this).attr('data-position') || 'top left',
+                change: function(hex, opacity) {
+                    if( !hex ) return;
+                    if( opacity ) hex += ', ' + opacity;
+                    try {
+                        console.log(hex);
+                        $("#preview").css("background-color",hex);
+                    } catch(e) {}
+                },
+                theme: 'bootstrap'
+            });
+
+        });
+        $("input[name='phone_num']").bind('focus',function(){
+            $("input[name='client_type']").eq(3).attr("checked","checked");
+            $("input[name='client_type']").eq(0).removeAttr("checked");
+            $("input[name='client_type']").eq(1).removeAttr("checked");
+            $("input[name='client_type']").eq(2).removeAttr("checked");
+            $("input[name='client_type']").eq(3).click();
+        });
+        $("select[name='msg_type']").bind('focus',function(){
+            $("input[name='radio_type']").eq(0).attr("checked","checked");
+            $("input[name='radio_type']").eq(1).removeAttr("checked");
+            $("input[name='radio_type']").eq(0).click();
+        });
+        var radio_type = $('input[name="radio_type"]:checked').val();
+        var type = $('select[name="msg_type"] option:selected') .val();
+        if(radio_type == 1){
+            selectTypeChange(type);
+        }
+        $('input[name="radio_type"]').change(function(){
+            radio_type = $('input[name="radio_type"]:checked').val();
+            if(radio_type == 1){
+                $(".custom").hide();
+                var type = $('select[name="msg_type"] option:selected') .val();
+                selectTypeChange(type);
+            }else{
+                $(".custom").show();
+                var custom_color = $("#custom_color").val();
+                var custom_title = $("#custom_title").val();
+                $("#preview").css("background-color",custom_color);
+                $("#preview").html(custom_title);
+            }
+        });
+        $('select[name="msg_type"]').change(function(){
+            var type = $('select[name="msg_type"] option:selected') .val();
+            var radio_type = $('input[name="radio_type"]:checked').val();
+            $(".custom").hide();
+            if(radio_type == 1) {
+                selectTypeChange(type);
+            }
+        });
+        $("#custom_title").change(function(){
+            var custom_title = $("#custom_title").val();
+            $("#preview").html(custom_title);
+
+        });
+        $('input[name="action_state"]').change(function(){
+            var radio_url = $('input[name="action_state"]:checked').val();
+            if(radio_url == 1){
+                $('.link').show();
+            }else {
+                $('.link').hide();
+            }
+        });
+    });
+    function selectTypeChange(type){
+        if(type == '公告'){
+            $("#preview").css("background-color","#FFAC36");
+            $("#preview").html("公告");
+        }else if(type == '活动'){
+            $("#preview").css("background-color","#41C3BE");
+            $("#preview").html("活动");
+        }else{
+            $("#preview").css("background-color","#F8694B");
+            $("#preview").html("提醒");
+        }
+    }
+
+    function checkNews(){
+        var client_type = $('input[name="client_type"]:checked').val();
+        if(client_type == 0){
+            var phone_num = $('input[name="phone_num"]').val().trim();
+            if(phone_num == ''){
+                $.messager.alert('提示','请填写推送人手机号！');
+                return false;
+            }
+            var isUserId = Number($("input[name='is_user_id']:checked").val());
+            if(isUserId){
+                var RegUrl = /^(((1+\d{6,8},){0,})+(1+\d{6,8}))$/;
+            }else {
+                var RegUrl = /^(((1+\d{10},){0,})+(1+\d{10}))$/;
+                if (!RegUrl.test(phone_num)) {
+                    $.messager.alert('提示', '请按格式填写推送人手机号！');
+                    return false;
+                }
+            }
+        }
+
+        var radio_type = $('input[name="radio_type"]:checked').val();
+        if(radio_type == 2){
+            var lable_name = $('input[name="lable_name"]').val().trim();
+            if(lable_name == ''){
+                $.messager.alert('提示','请填写自定义标签名称！');
+                return false;
+            }
+            if(lable_name.length > 20){
+                $.messager.alert('提示','自定义标签名称不能超过20个字！');
+                return false;
+            }
+            var lable_color = $('input[name="lable_color"]').val().trim();
+            if(lable_color == ''){
+                $.messager.alert('提示','请填写自定义标签颜色！');
+                return false;
+            }
+        }
+
+        var message_title = $('input[name="message_title"]').val().trim();
+        if(message_title == ''){
+            $.messager.alert('提示','请填写消息标题！');
+            return false;
+        }
+        if(message_title.length > 16){
+            $.messager.alert('提示','消息标题长度不能超过16个字！');
+            return false;
+        }
+
+        var message_abstract = $('#message_abstract').val().trim();
+        if(message_abstract == ''){
+            $.messager.alert('提示','请填写消息摘要！');
+            return false;
+        }
+        if(message_abstract.length > 128){
+            $.messager.alert('提示','消息摘要不能超过128个字！');
+            return false;
+        }
+        var message_details = $('#message_details').val().trim();
+        if(message_abstract == ''){
+            $.messager.alert('提示','请填写消息内容！');
+            return false;
+        }
+
+        var action_state = $('input[name="action_state"]:checked').val();
+        if(action_state == 1){
+            var url = $('input[name="url"]').val().trim();
+            if(url == ''){
+                $.messager.alert('提示','请填写相应链接地址！');
+                return false;
+            }
+            var action = $('input[name="action"]:checked').val();
+            var RegUrl = /^(http:\/\/)|(https:\/\/)/;
+            if(action == 'open_web' && !RegUrl.test(url)){
+                $.messager.alert('提示','请填写有效的链接地址！格式：http://xxx.xxx.. 或 https://xxx.xxx...');
+                return false;
+            }
+
+            var valid_dt = $('input[name="valid_dt"]').val().trim();
+            if(valid_dt == ''){
+                $.messager.alert('提示','请填写链接有效截止时间！');
+                return false;
+            }
+        }
+
+        return true;
+    }
+    var btn = true;
+    function saveNews(){
+        var check = checkNews();
+        if(!check){
+            return;
+        }
+        $('input[name="send"]').val(0);
+        return postNews();
+    }
+    function sendNews(){
+        var check = checkNews();
+        if(!check){
+            return;
+        }
+        $('input[name="send"]').val(1);
+        return postNews();
+    }
+    function postNews(){
+        if(!btn){
+            return false;
+        }
+        btn = false;
+        $('#ff').form('submit',{
+            onSubmit:function(){
+            },
+            success:function(data){
+                if (data >0) {
+                    $.messager.alert("提示","操作成功");
+                    window.location.href = "__URL__/index";
+                }else{
+                    btn = true;
+                    $.messager.alert("提示","操作失败,数据无变化");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

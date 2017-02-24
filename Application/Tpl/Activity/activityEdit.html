@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消息编辑</title>
+    <include file="Public:easyui_res" />
+</head>
+<body>
+<div class="easyui-panel" title="编辑" style="width:100%;">
+    <div style="padding:10px 60px 20px 60px">
+        <form id="ff" method="post" action="__URL__/activityEdit">
+            <table cellpadding="5">
+                <tr>
+                    <td align="right"><span style="color: red">*</span>活动标题：</td>
+                    <td>
+                        <input type="hidden" name="activity_id" value="{$detail.activity_id}" id="activity_id">
+                        <input class="form-control" name="activity_title" id="activity_title" value="{$detail.activity_title}"  placeholder="请输入活动标题" style="width:400px;height:30px"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>活动类型：</td>
+                    <td>
+                        <eq name="detail.client_type" value="1"><input type="radio" name="client_type" value="1" checked="checked"><else/><input type="radio" name="client_type" value="1" ></eq> 贵州版 &nbsp;
+                        <eq name="detail.client_type" value="2"><input type="radio" name="client_type" value="2" checked="checked"><else/><input type="radio" name="client_type" value="2" ></eq> 全国版 &nbsp;
+                        <eq name="detail.client_type" value="3"><input type="radio" name="client_type" value="3" checked="checked"><else/><input type="radio" name="client_type" value="3" ></eq> 贵州版+全国版
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>活动图片：</td>
+                    <td>
+                        <div id="pic" >
+                            <img src='{$detail.activity_img}'  height='200px' />
+                        </div>
+                        <input type="file" id="file" name="file" />
+                        <input type="hidden" id="activity_img" name="activity_img" value="{$detail.activity_img}" />
+                        <a href="#" class="easyui-linkbutton" onclick="ajaxFileUpload('file');" >上传图片</a>
+                        <span>注：图片建议尺寸530*226px</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right"><span style="color: red">*</span>活动内容：</td>
+                    <td>
+                        <textarea class="form-control" id="activity_abstract" name="activity_abstract" placeholder="请输入活动摘要"  style="height: 50px;width: 600px">{$detail.activity_abstract}</textarea>
+                    </td>
+                </tr>
+
+                <tr class="link">
+                    <td align="right"><span style="color: red">*</span>活动链接：</td>
+                    <td>
+                        <input type="url" class="form-control" name="activity_web_url" value="{$detail.activity_web_url}"  placeholder="请输入链接地址" style="width:400px;height:30px"/>
+                        <span>格式：http://xxx.xxx.. 或 https://xxx.xxx...</span>
+                    </td>
+                </tr>
+                <tr class="link">
+                    <td align="right"><span style="color: red">*</span>分享链接：</td>
+                    <td>
+                        <input type="url" class="form-control" name="activity_share_url" value="{$detail.activity_share_url}"  placeholder="请输入分享链接地址" style="width:400px;height:30px"/>
+                        <span>格式：http://xxx.xxx.. 或 https://xxx.xxx...</span>
+                    </td>
+                </tr>
+                <tr class="link">
+                    <td align="right"><span style="color: red">*</span>开始时间：</td>
+                    <td>
+                        <input type="datetime" class="easyui-datetimebox" style="width:200px;height:30px" id="start_dt"  name="start_dt" value="{$detail.start_dt}" data-options="required:true,editable:false" />
+                    </td>
+                </tr>
+                <tr class="link">
+                    <td align="right"><span style="color: red">*</span>结束时间：</td>
+                    <td>
+                        <input type="datetime" class="easyui-datetimebox" style="width:200px;height:30px" id="end_dt"  name="end_dt" value="{$detail.end_dt}" data-options="required:true,editable:false" />
+                    </td>
+                </tr>
+                <tr class="link">
+                    <td><span style="color: red">*</span>是否推送：</td>
+                    <td>
+                        <input type="hidden" name="send" value="0">
+                        <input type="hidden" name="push_state" value="{$detail.push_state}">
+                        <eq name="detail.push_state" value="4">
+                            <input type="radio" name="push"  value="1">是
+                            <input type="radio" name="push"  value="0" checked="checked">否
+                        <else/>
+                            <input type="radio" name="push"  value="1" checked="checked">是
+                            <input type="radio" name="push"  value="0">否
+                        </eq>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>
+                        <div style="padding:5px 0">
+                            <a href="javascript:void(0);" class="easyui-linkbutton"  onclick="saveNews()" data-options="iconCls:'icon-save'" style="width:100px;height:30px">保存</a>
+                            <a href="javascript:void(0);" class="easyui-linkbutton" id="return" iconCls="icon-undo" style="width:100px;height:30px" onclick="javascript:window.location.href='__URL__/activity'">返回</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/ajaxfileupload.js"></script>
+<script>
+    function ajaxFileUpload(file_id){
+        var file_name = $("#"+file_id).val();
+        if(file_name == "" ){
+            $.messager.alert('提示','请选择图片!');
+            return false;
+        }
+        if(!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(file_name)){
+            $.messager.alert('提示','请上传GIF/JPG/PNG格式的图片！');
+            return false;
+        }
+        var action_url = '{$upload_addr}';
+        $.ajaxFileUpload
+        (
+                {
+                    url: action_url, //用于文件上传的服务器端请求地址
+                    type: 'post',
+                    data: { }, //此参数非常严谨，写错一个引号都不行
+                    secureuri: false, //一般设置为false
+                    fileElementId: file_id, //文件上传空间的id属性  <input type="file" id="file" name="file" />
+                    dataType: 'text', //返回值类型 一般设置为json
+                    success: function (data, status)  //服务器成功响应处理函数
+                    {
+                        data = data.replace("<pre>","");
+                        data = data.replace("</pre>","");
+                        var json = JSON.parse(data);
+                        if(json.code == 0){
+                            $.messager.alert('提示',"上传成功");
+                            $("#device_icon").val(json.file_name);
+                            var img_html = "<img src='{$down_addr}"+json.file_name+"/"+Math.random()+"'  height='150px' />";
+                            $("#activity_img").val("{$down_addr}"+json.file_name+"/"+Math.random());
+                            $("#pic").html(img_html);
+                        }else{
+                            $.messager.alert('提示',"上传失败");
+                        }
+                    },
+                    error: function (data, status, e)//服务器响应失败处理函数
+                    {
+                        alert(e);
+                    }
+                }
+        );
+        return false;
+    }
+    function checkNews(){
+        var activity_title = $('input[name="activity_title"]').val().trim();
+        if(activity_title == ''){
+            $.messager.alert('提示','请填写活动标题！');
+            return false;
+        }
+
+        if(activity_title.length > 16){
+            $.messager.alert('提示','活动标题不能超过16个字！');
+            return false;
+        }
+
+        var activity_img = $('input[name="activity_img"]').val();
+        if(activity_img == ''){
+            $.messager.alert('提示','请上传活动图片！');
+            return false;
+        }
+
+        var activity_abstract = $('#activity_abstract').val().trim();
+        if(activity_abstract == ''){
+            $.messager.alert('提示','请填写活动内容摘要！');
+            return false;
+        }
+
+        if(activity_abstract.length > 128){
+            $.messager.alert('提示','活动内容摘要不能超过128个字！');
+            return false;
+        }
+
+        var activity_web_url = $('input[name="activity_web_url"]').val().trim();
+        if(activity_web_url == ''){
+            $.messager.alert('提示','请填写活动地址！');
+            return false;
+        }
+        var RegUrl = /^(http:\/\/)|(https:\/\/)/;
+        if(!RegUrl.test(activity_web_url)){
+            $.messager.alert('提示','请填写有效的活动网址！格式：http://xxx.xxx.. 或 https://xxx.xxx...');
+            return false;
+        }
+
+        var activity_share_url = $('input[name="activity_share_url"]').val().trim();
+        if(activity_share_url == ''){
+            $.messager.alert('提示','请填写活动分享地址！格式：http://xxx.xxx.. 或 https://xxx.xxx...');
+            return false;
+        }
+
+        if(!RegUrl.test(activity_share_url)){
+            $.messager.alert('提示','请填写有效的活动分享网址！');
+            return false;
+        }
+
+        var start_dt = $('input[name="start_dt"]').val().trim();
+        if(start_dt == ''){
+            $.messager.alert('提示','请填写活动开始时间！');
+            return false;
+        }
+
+        var end_dt = $('input[name="end_dt"]').val().trim();
+        if(end_dt == ''){
+            $.messager.alert('提示','请填写活动结束时间！');
+            return false;
+        }
+
+        var startDt = new Date(start_dt.replace(/\-/g, "\/"));
+        var endDt = new Date(end_dt.replace(/\-/g, "\/"));
+        if(endDt < startDt){
+            $.messager.alert('提示','结束时间不能小于开始时间！');
+            return false;
+        }
+
+
+        return true;
+    }
+    var btn = true;
+    function saveNews(){
+        var check = checkNews();
+        if(!check){
+            return;
+        }
+        $('input[name="send"]').val(0);
+        return postNews();
+    }
+    function sendNews(){
+        var check = checkNews();
+        if(!check){
+            return;
+        }
+        $('input[name="send"]').val(1);
+        return postNews();
+    }
+    function postNews(){
+        if(!btn){
+            return false;
+        }
+        btn = false;
+        $('#ff').form('submit',{
+            onSubmit:function(){
+            },
+            success:function(data){
+                if (data >0) {
+                    $.messager.alert("提示","操作成功");
+                    window.location.href = "__URL__/activity";
+                }else{
+                    btn = true;
+                    $.messager.alert("提示","操作失败,数据无变化");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>问诊卡配置</title>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/icon.css">
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+
+    <style>
+        table img{
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px" >
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id ="searchform" style="height:20px;margin-bottom: 20px">
+            <label for="get_type">领取类型：</label>
+            <select class="easyui-combobox" id ="get_type" name="get_type" style="width:140px;height:32px;">
+                <option value="-1">全部</option>
+                <option value="1">首次领取</option>
+                <option value="2">每日领取</option>
+                <option value="3">每月领取</option>
+            </select>
+            <label for="per_limit">权限限制：</label>
+            <select class="easyui-combobox" id ="per_limit" name="per_limit" style="width:140px;height:32px;">
+                <option value="-1">全部</option>
+                <!--<option value="0">贵健康用户</option>
+                <option value="1">IVR会员</option>-->
+                <option value="2">全国版VIP</option>
+                <option value="3">全国版非VIP</option>
+            </select>
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search"  style="width:60px;height:32px">查询</a>
+            <a href="__URL__/cardEdit" class="easyui-linkbutton" iconCls="icon-add"  style="height:32px;margin-right: 60px">添加</a>
+        </form>
+    </div>
+</div>
+<table id="dg"  style="width:100%; "  title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'coupons_id',align:'center',width:'15px'">券ID</th>
+        <th data-options="field:'coupons_name',align:'center',width:'20px'">券名称</th>
+        <th data-options="field:'coupons_desc',align:'center',width:'35px'">券说明</th>
+        <th data-options="field:'free_coin',align:'center',width:'20px'">券面额</th>
+        <th data-options="field:'limit_num',align:'center',width:'25px'">使用次数</th>
+        <th data-options="field:'get_num',align:'center',width:'25px'">可领取次数</th>
+        <th data-options="field:'get_type',align:'center',width:'20px'">领取类型</th>
+        <th data-options="field:'valid_dt',align:'center',width:'20px'">有效天数</th>
+        <th data-options="field:'per_limit_desc',align:'center',width:'20px'">权限限制</th>
+        <th data-options="field:'limit_begin_dt',align:'center',width:'40px'">使用开始时间</th>
+        <th data-options="field:'limit_end_dt',align:'center',width:'40px'">使用结束时间</th>
+        <th data-options="field:'get_begin_dt',align:'center',width:'40px'">领取开始时间</th>
+        <th data-options="field:'get_end_dt',align:'center',width:'40px'">领取结束时间</th>
+        <th data-options="field:'action',align:'center',width:'20px'">操作提示</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 20;
+    $("#dg").css("height",height+"px");
+    function card_delete(id,per){
+        $.messager.confirm('提示', '确定要删除吗?', function(r){
+            if(r){
+                $.ajax( {
+                    url: '__URL__/cardDelete',
+                    type: 'post',
+                    data: {'coupons_id':id,'per_limit':per},
+                    cache:false,
+                    dataType:'json',
+                    success: function (data){
+                        if(data >0 ){ //影响行大于0则成功
+                            m_info("删除成功");
+                            $("#submit_search").click();
+                        }else{
+                            m_erro("删除失败");
+                        }
+                    },
+                    error: function (data, status, e){
+                        m_erro(e);
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+        <link href="__PUBLIC__/css/console.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="__PUBLIC__/js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/permission.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/validate.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/js/md5.js"></script>
+		<load href ="__PUBLIC__/js/json2.js" />
+	        <script type="text/javascript">
+//            window.onload = function(){
+//                sel("#superManager");
+//            };
+            //验证ip地址的格式，有效的IPv4地址返回true，否则false.
+            function validIp(ipStr) {
+                var regip = /^(([0-1]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}([0-1]?\d{1,2}|2[0-4]\d|25[0-5])$/;	//验证ip地址的正则表达式。
+                var flag = regip.test(ipStr);
+                return flag;
+            }
+
+            function save(per) {
+
+                var admin_name = encodeURIComponent($("#realName").val());
+                if (admin_name == "") {
+                    $("#lblMsg").html("管理员员姓名不能为空！");
+                    return;
+                }
+
+                var login_name = encodeURIComponent($("#userName").val());
+                if (login_name == "") {
+                    $("#lblMsg").html("登陆名称不能为空！");
+                    return;
+                }
+
+                var admin_password = encodeURIComponent($("#password").val());
+                if (admin_password == "") {
+                    $("#lblMsg").html("管理员密码不能为空！");
+                    return;
+                }
+
+                if (per == "") {
+                    $("#lblMsg").html("请给管理员分配权限！");
+                    return;
+                }
+                var again_password = encodeURIComponent($("#again_password").val());
+                if (again_password == "") {
+                    $("#lblMsg").html("确认密码不能为空！");
+                    return;
+                }
+                var text = encodeURIComponent($("#text").val());
+                if (admin_password != again_password) {
+                    $("#lblMsg").html("两次密码输入不同！");
+                    return;
+                }
+                var limitLoginIp = $("#limitloginip").val();
+                if (limitLoginIp != "") {
+                    var flagIp = validIp(limitLoginIp);
+                    if (!flagIp) {
+                        $("#lblMsg").html("输入的ip地址是错误的。ip地址的输入格式实例：127.0.0.1");
+                        return;
+                    }
+                } else
+                    limitLoginIp = "0.0.0.0";
+	                limitLoginIp = encodeURIComponent(limitLoginIp);
+	                var jsonObj = new Object();
+	                jsonObj["admin_level"] = per;
+	                jsonObj["admin_name"] = admin_name;
+	                jsonObj["login_name"] = login_name;                
+	                jsonObj["password"] = $.md5(admin_password);
+	                jsonObj["limit_login_ip"] = limitLoginIp;
+	                var json = JSON.stringify(jsonObj);
+	                
+	                $.post("?"+Math.random(), "json=" + json, function(Msg) {
+	                    $("#lblMsg").html(Msg);
+	                    if (/OK/.test(Msg)) {
+	                        document.form1.reset();
+	                    }
+	                });
+            }
+            function sel(obj) {
+                if (obj.checked) {
+                    var attr = $("#permissionDiv").find("input");
+                    for (var i = 0; i <= attr.length; i++) {
+                        if (attr[i] != undefined || attr[i] != null)
+                            attr[i].checked = true;
+                    }
+                } else {
+                    var attr = $("#permissionDiv").find("input");
+                    for (var i = 0; i <= attr.length; i++) {
+                        if (attr[i] != undefined || attr[i] != null)
+                            attr[i].checked = false;
+                    }
+
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="system"> 
+            <span class="bg">添加新成员</span> 
+        </div>
+        <div class="form-s1">
+            <form name="form1" class="form1 form2">
+                
+                <div class="data clear-div">
+                <table width="100%" id="list_table">
+                    <tr></tr>
+                    <tr>
+                        <td width="15%">管理人姓名：</td>
+                        <td width="70%"><input  class="input-text" type="text" id="realName"/></td>
+                        <td width="15%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">登录名称：</td>
+                        <td id="user_name" width="70%"><input  class="input-text" type="text" id="userName"/></td>
+                        <td width="15%">&nbsp;</td>
+                    </tr>
+                    <tr style="display: none">
+                        <td width="15%">允许IP：</td>
+                        <td id="gender" width="70%"><input class="input-text" value="0.0.0.0" type="text" id="limitloginip" name="ipstr" /></td>
+                        <td width="15%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">管理员密码：</td>
+                        <td id="charm_num" width="70%"><input  class="input-text"  type="password" id="password" name ="password"/></td>
+                        <td width="15%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="15%">确认密码：</td>
+                        <td id="riches_num" width="70%"><input  class="input-text"  type="password" id="again_password" name ="again_password"/></td>
+                        <td width="15%">&nbsp;</td>
+                    </tr>
+                    <tr></tr>
+                </table>
+                
+                    
+                <div class="sys-name clear-div">
+                    <input type="checkbox" class="chkfloat" id="superManager" onClick="sel(this)"><label for="superManager">超级管理员</label>
+                </div>
+
+                <div class="sys-name clear-div he-s1">
+                    <input class="buton-s bg" id="saveButton" type="button" value="保存" onClick="javascript:save(getPermission());">
+                    <input  class="input-text" type="hidden" id="session" value=Admin/>
+                    <input  class="input-text" type="hidden" id="rights_flag" value="super"/>
+                </div>
+                <div id="lblMsg" class="clear-div"></div>
+                </div>
+            </form>		
+            <div id="permissionDiv">	
+				{$html}
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,72 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>申请退款</title>
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/easyui/themes/icon.css">
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/easyui_common.js"></script>
+
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<form autocomplete="off">
+    <textarea name="reason" id="reason" placeholder="请填写申请退款原因" style="width: 99%;height: 250px"></textarea>
+    <br/>
+    <span style="float: right;font-size: 10px" id="sp_reason">还可以输入<strong style="color: red">500</strong>个字符</span>
+    <br/>
+    <br/>
+    <div style="width: 100%;text-align: center">
+        <a href="javascript:void(0);" class="easyui-linkbutton"  id="save_submit"  style="width:100px;height:30px">确定</a>&nbsp;&nbsp;
+        <a href="javascript:void(0);" class="easyui-linkbutton"  id="save_off"  style="width:100px;height:30px">取消</a>
+    </div>
+</form>
+<script type="text/javascript">
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    $(function () {
+        $("#reason").keyup(function () {
+            var reason = $(this).val().trim();
+            $("#sp_reason strong").html(500 - reason.length);
+            if(reason.length > 500){
+                $(this).val($(this).val().substring(0,500));
+            }
+        });
+        $("#save_off").click(function () {
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            parent.layer.close(index);
+        });
+        $("#save_submit").click(function () {
+            var order_id = '<?php echo ($order_id); ?>';
+            var reason = $("#reason").val().trim();
+            $.ajax( {
+                url: '__URL__/applyForRefund',
+                type: 'post',
+                data: {'order_id':order_id,'reason':reason},
+                cache:false,
+                dataType:'json',
+                success: function (data){
+                    if(data.code == "0"){
+                        layer.msg("操作成功");
+                        parent.window.location.href = "__URL__/index";
+                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        parent.layer.close(index);
+                    }else{
+                        layer.msg(data.message);
+                    }
+                },
+                error: function (){
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

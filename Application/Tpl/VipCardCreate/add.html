@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+		<include file="Public:easyui_res" />
+    </head>
+    <body >
+	<div class="easyui-panel" title="{$title}" style="width:100%;">
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post" >
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>健康卡类型:</td>
+	    			<td>
+	    			  
+			<select class="easyui-combobox" name="card_type">
+
+		    				<volist name="card_type" id="vo" >
+					<option value="{$key}">{$vo}</option>
+					</volist>
+		    			</select> 
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td>健康卡渠道 ：</td>
+	    			<td>
+	    			<select class="easyui-combobox" name="card_channel">
+		    				<volist name="card_channel" id="vo" >
+					<option value="{$key}">{$vo}</option>
+					</volist>
+		    			</select> 
+	    			</td>
+	    		</tr>
+	    		<!-- 
+	    		<tr>
+	    			<td>vip等级 ：</td>
+	    			<td><input class="easyui-textbox" type="text" name="vip_level"  data-options="required:true" ></input></td>
+	    		</tr>
+ -->
+				 <tr>
+	    			<td>卡时长  ：</td>
+	    			<td><input class="easyui-numberbox" name="card_time"  data-options="prompt:'单位(天)',required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>有效截止时间  ：</td>
+	    			<td><input class="easyui-datebox" name="effect_duration"  data-options="prompt:'请输入截止日期',required:true,editable:false" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>高级提问次数 ：</td>
+	    			<td><input class="easyui-numberbox" name="adv_quest_num"  data-options="prompt:'请输入数字',required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>追问次数  ：</td>
+	    			<td><input class="easyui-numberbox" name="quest_closely_num"  data-options="prompt:'请输入数字',required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>需要生成卡数量 ：</td>
+	    			<td><input class="easyui-numberbox" name="card_num" max="5000"  data-options="prompt:'单次最大5000张',required:true" ></input></td>
+	    		</tr>
+	    		
+	    		</table>
+	    		
+	    	</form>
+	    		
+	    	
+	     <div style="padding:5px;"  >
+	     <div id="text" style="color:red;font-size: 20px"></div>
+	     	<div id="save_div">
+	     	<a href="javascript:void(0);" id="add" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-add'" style="width:100px;height:32px">开始生成</a>
+	      <a href="#" id="return" class="easyui-linkbutton" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+	      	</div>
+	    </div>
+	    </div>
+	</div>
+	<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				onSubmit:function(){
+					var json = form2Json("ff");
+					var form_valid = $(this).form('enableValidation').form('validate');
+					if(!form_valid ){
+						return false; 
+					}
+					$("#save_div").css("display","none");
+					$("#text").append("正在生成，请不要操作管理系统...");
+					 $.post("__URL__/add/"+Math.random(),json, function(data) {
+			             if (data > 0) {
+			            	 $.messager.alert("提示","操作成功");
+			            	 setTimeout('$("#return").click();',1000);
+			             }else{
+			            	 $.messager.alert("提示","操作失败,请重试");
+			             }
+		            	 $("#save_div").css("display","block");
+						$("#text").html("");
+			         });
+					 
+					 return false;
+				}
+			});
+			
+		
+		}
+
+		
+		
+	</script>
+	
+    </body>
+</html>
+

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>高德导航</title>
+    <style>
+        html,body{width: 100%;height: 100%;overflow: hidden;margin: 0px;padding: 0px;}
+        .main{width: 98%;height: 98%; margin: 4px; border: 1px solid #95B8E7; }
+        .main .left{width: 200px;height: 100%;overflow: hidden;float: left;border-right: 1px solid #95B8E7;}
+        .main .left .query{width: 180px;height: auto;line-height: 40px;margin: 10px;font-size: 14px;float: left}
+        .main .left .query .items{width: 100%;height: auto;float: left;}
+        .main .left .query .items input[type='radio']{margin: 0px;padding: 0px;line-height: 40px}
+        .main .left .query .items input[type='text'],.main .left .query .items input[type='button']{width: 176px;height: 24px;font-size: 14px;}
+        .main .left .query .items input[type='button']{width: 180px;height: 32px}
+        .main .right {width: 50%;height: 100%;overflow: hidden;float: right}
+        .main .right #container {width:100%; height: 100%; }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="left">
+        <div class="query">
+            <div class="items">
+                <input type="radio" name="type_id" value="1">&nbsp;按坐标
+                <input type="radio" name="type_id" value="2" checked="checked">&nbsp;按关键字
+            </div>
+            <div class="items" id="it_keyword">
+                <input type="text" name="keyword" id="keyword" placeholder="请输入关键字进行搜索" value="{$address}">
+            </div>
+            <div class="items" id="it_coordinate" style="display: none">
+                <input type="text" name="coordinate" id="coordinate" placeholder="请输入经纬度进行搜索" value="{$map}">
+            </div>
+            <div class="items">
+                <input type="button"  id="btn_query" value="搜索">
+            </div>
+        </div>
+        <div class="query" style="margin-top: 50px">
+            <div class="items"><span>坐标获取结果</span></div>
+            <div class="items">
+                <input type="text" name="lon_and_lat" id="lon_and_lat" value="{$map}" placeholder="请选择坐标" readonly="readonly">
+            </div>
+            <div class="items">
+                <input type="button" id="btn_checked" value="确认选择">
+            </div>
+            <div class="items">
+                <input type="button" id="btn_cancel" value="取消返回">
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div id="container"></div>
+    </div>
+</div>
+<include file="Public:common_res" />
+<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=1f318b2f4d88d697189efac686d72cf9&plugin=AMap.Autocomplete"></script>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 10;
+    var width = document.documentElement.clientWidth;
+    width = width - 10;
+    $(".main").css("width",width+"px");
+    var right_width = width - 201;
+    $(".main .right").css("width",right_width+"px");
+    var lon_and_lat = '{$map}';
+
+    var map = new AMap.Map("container", {
+        resizeEnable: true,
+        zoom: 18
+    });
+    if(lon_and_lat != '' && lon_and_lat != ","){
+        $("input[name='type_id']").eq(0).attr("checked","checked");
+        $("input[name='type_id']").eq(1).removeAttr("checked");
+        $("input[name='type_id']").eq(0).click();
+        $("#it_keyword").hide();
+        $("#it_coordinate").show();
+    }
+    map.setCenter([{$lonLat}]);
+    marker = new AMap.Marker({
+        position: [{$lonLat}],
+        map: map
+    });
+    var clickEventListener = map.on('click', function(e) {
+        $("#lon_and_lat").val(e.lnglat.getLng() + ',' + e.lnglat.getLat());
+    });
+    window.onload = function () {
+        map.plugin(["AMap.ToolBar"], function() {
+            map.addControl(new AMap.ToolBar());
+        });
+        $("#btn_query").click();
+        $(function () {
+            AMap.service('AMap.Geocoder',function(){
+                geocoder = new AMap.Geocoder();
+                $("#btn_query").click(function () {
+                    var type_id = $("input[name='type_id']:checked").val();
+                    if(type_id == 1){
+                        var coordinate = $("#coordinate").val();
+                        var arr = coordinate.split(",");
+                        if(arr.length != 2 || coordinate == '' || coordinate == ","){
+                            layer.msg("请输入正确的经纬度");
+                            return;
+                        }
+                        var title = "";
+                        var lngLatXY=arr;//地图上所标点的坐标
+                        geocoder.getAddress(lngLatXY, function(status, result) {
+                            if (status === 'complete' && result.info === 'OK') {
+                                $("#lon_and_lat").val(coordinate);
+                                title = result.regeocode.formattedAddress
+                            }else {
+                                layer.msg("抱歉，根据您输入的坐标查询不到相应的地点！");
+                                return;
+                            }
+                        });
+                        map.setCenter(lngLatXY);
+                        marker.setMap();
+                        marker = new AMap.Marker({
+                            position: lngLatXY,
+                            title:title,
+                            map: map
+                        });
+                    }else {
+                        var address = $("#keyword").val();
+                        geocoder.getLocation(address, function(status, result) {
+                            if (status === 'complete' && result.info === 'OK') {
+                                var lng = result.geocodes[0].location.lng;
+                                var lat = result.geocodes[0].location.lat;
+                                var title = result.geocodes[0].formattedAddress;
+                                map.setCenter([lng,lat]);
+                                marker.setMap();
+                                marker = new AMap.Marker({
+                                    position: [lng,lat],
+                                    title:title,
+                                    map: map
+                                });
+                                $("#lon_and_lat").val(lng + ',' + lat);
+                            }else {
+                                layer.msg("抱歉，根据您输入的关键字查询不到相应的地点！")
+                            }
+                        });
+                    }
+                });
+            })
+        })
+    }
+    $(function () {
+        $("input[name='type_id']").change(function () {
+            var type_id = $("input[name='type_id']:checked").val();
+            if(type_id == 1){
+                $("#it_keyword").hide();
+                $("#it_coordinate").show();
+            }else {
+                $("#it_keyword").show();
+                $("#it_coordinate").hide();
+            }
+        });
+        $("#btn_checked").click(function () {
+            parent.$("#map").textbox("setValue",$("#lon_and_lat").val());
+            window.parent._closeMap();
+        });
+        $("#btn_cancel").click(function () {
+            window.parent._closeMap();
+        });
+    })
+</script>
+</body>
+</html>

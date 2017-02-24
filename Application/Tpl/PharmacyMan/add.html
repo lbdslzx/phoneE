@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Insert title here</title>
+<include file="Public:easyui_res" />
+    </head>
+    <body >
+	<div class="easyui-panel" title="{$title}" style="width:100%;">
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post" >
+	    	<table cellpadding="5">
+	    			
+	    		<tr>
+	    			<td>药店名 ：</td>
+	    			<td><input class="easyui-textbox" type="text" name="pharmacy_name"  data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>所属品牌：</td>
+	    			<td>
+	    			<select class="easyui-combobox" name="brand_id" id="brand_id" data-options="required:true">
+					<volist name="brand_info" id="vo" >
+					<option value="{$vo.brand_id}">{$vo.brand_name}</option>
+					</volist>
+	    			</select>
+					</td>
+	    		</tr>
+	    		<tr>
+	    			<td>药店登陆密码：</td>
+	    			<td><input class="easyui-textbox" type="text" name="pharmacy_password"  data-options="required:true" ></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>后台登陆密码：</td>
+	    			<td><input class="easyui-textbox" type="text" name="admin_password"  data-options="required:true" ></input></td>
+	    		</tr>
+	    		</table>
+	    	</form>
+	     <div style="padding:5px">
+	     	<a href="javascript:void(0);" class="easyui-linkbutton"  onclick="submitForm()" data-options="iconCls:'icon-add'" style="width:100px;height:32px">添加</a>
+	      <a href="#" class="easyui-linkbutton" iconCls="icon-undo" style="width:100px;height:32px" onclick="javascript:window.location.href='__URL__/index'">返回</a>
+	    </div>
+	    </div>
+	</div>
+	<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				onSubmit:function(){
+					var data = form2Json("ff");
+					var form_valid = $(this).form('enableValidation').form('validate');
+					if(!form_valid ){
+						return false; 
+					}
+					data["brand_name"] =$("#brand_id").combobox('getText');
+					 $.post("__URL__/add/"+Math.random(), data, function(data) {
+			             if (data >0) {
+			            	 $.messager.alert("提示","操作成功");
+			             }else{
+			            	 $.messager.alert("提示","操作失败,请勿重复添加");
+			             }
+			         });
+					 return false;
+				}
+			});
+			
+		
+		}
+	</script>
+	
+    </body>
+</html>
+

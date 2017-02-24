@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>活动参与查询</title>
+    <include file="Public:easyui_res"/>
+    <script type="text/javascript" src="__PUBLIC__/layer/layer.js"></script>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px">
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id="searchform" style="height:auto;margin-bottom: 20px;line-height: 40px">
+            <label type="user_type">用户类型：</label>
+            <select class="easyui-combobox" id ="user_type" name="user_type" style="width:140px;height:32px;">
+                <option value="">全部</option>
+                <option value="1">无推荐人</option>
+                <option value="2">老用户</option>
+                <option value="3">用户推荐</option>
+            </select>
+            <select class="easyui-combobox" id ="be_user_type" name="be_user_type" style="width:140px;height:32px;">
+                <option value="">全部</option>
+                <option value="1">已注册</option>
+                <option value="2">未注册</option>
+            </select>
+            <label for="recommend_password">推荐口令：</label>
+            <input class="easyui-textbox"  type="text" id="recommend_password" name="recommend_password" data-options="prompt:'输入推荐口令'" style="height: 32px;">
+            <br/>
+            <label>参与时间：</label>
+            <input class="easyui-datebox" id="bt"  name="bt" style="height: 32px;width: 140px"   />至<input class="easyui-datebox" id="et"  name="et" style="width:140px;height: 32px;"   />
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search" style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg" style="width:100%; " title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getPartakeList',
+			method:'post',
+			toolbar:'#tb',
+			pageSize: 25,
+			pageList: [25,50,100],
+			">
+    <thead>
+    <tr>
+        <th data-options="field:'user_id',formatter:formatUserId,align:'center',width:'50px'">推荐人</th>
+        <th data-options="field:'be_user_id',align:'center',width:'50px'">被推荐人</th>
+        <th data-options="field:'tourist_code',align:'center',width:'50px'">游客码</th>
+        <th data-options="field:'recommend_password',align:'center',width:'50px'">推荐口令</th>
+        <th data-options="field:'insert_dt',align:'center',width:'50px'">参与时间</th>
+        <th data-options="field:'operation',formatter:formatOperation,align:'center',width:'50px'">操作</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/javascript">
+    var height = document.documentElement.clientHeight;
+    height = height - 20;
+    $("#dg").css("height",height+"px");
+    ;!function(){
+        //加载扩展模块
+        layer.config({
+            extend: 'extend/layer.ext.js'
+        });
+    }();
+    function formatUserId(val,row) {
+        return val == "0" ? "" : val == 1 ? "老用户" : val
+                ;
+    }
+    function formatOperation(val,row) {
+        var participateId = row.participate_id;
+        return "<a href='javascript:void(0);' onclick='partakeDel(\""+participateId+"\")'>删除</a>";
+    }
+    function partakeDel(participateId) {
+        layer.msg("确定删除？",{
+            time: 10000, //10s后自动关闭
+            btn: ['确定', '取消'],
+            yes: function () {
+                $.ajax({
+                    url: '__URL__/partakeDel',
+                    type: 'post',
+                    data: {'participate_id': participateId},
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data > 0) {
+                            layer.msg('已删除！');
+                            $('#dg').datagrid({queryParams: form2Json("searchform")});
+                        } else {
+                            layer.msg("删除失败！");
+                        }
+                    },
+                    error: function () {
+                        layer.msg("删除异常");
+                    }
+                });
+            }
+        },{});
+    }
+</script>
+</body>
+</html>

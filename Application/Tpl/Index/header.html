@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+            <title>退出登录</title>
+            <link href="__PUBLIC__/css/console.css" rel="stylesheet" type="text/css" />
+            <script src="__PUBLIC__/js/jquery-1.10.2.min.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="top_panner" >
+            <span>当前用户：{$user_name}</span>&emsp;
+
+            <marquee style="WIDTH: 350px" scrollamount="2" direction="left" >
+                <span id="video_notice" style="display: none; color: #ff1818;">[<font color="#ff1818" title="有新的视频需要审核">有新的视频需要审核</font>]</span>
+            </marquee >
+
+            <div id="sound" style="display: none;">
+            </div>
+
+            <span class="right">
+                <a id="audio_status" title="点击修改提示音" style="display: none;">提示音状态：开启</a>
+                <a href="__URL__/showTpl/password_edit" target="rbottom">修改密码</a>
+                <a id="lnkLogout" href="__APP__/Login/logOut" target="_top">退出登录</a>
+            </span>
+        </div>
+    </body>
+</html>

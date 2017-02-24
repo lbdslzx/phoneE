@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>问诊卡配置</title>
+    <include file="Public:easyui_res"/>
+    <style>
+        table img {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="tb" style="padding:5px;height:auto;">
+    <div style="margin: 10px 0 10px 10px">
+        <!-- form表单 指定id和name之后会自动带到服务器 -->
+        <form name="searchform" method="get" action="" id="searchform" style="height:20px;margin-bottom: 20px">
+            <label>操作时间：</label>
+            <input class="easyui-datebox" id="bt"  name="bt"  data-options="required:true" /> 到 <input class="easyui-datebox" id="et"  name="et"  data-options="required:true" />
+            <label for="user_tel">手机号：</label>
+            <input type="text" id="user_tel" name="user_tel" placeholder="输入电话号码">
+            <a href="javascript:void(0);" id="submit_search" class="easyui-linkbutton" iconCls="icon-search" style="width:60px;height:32px">查询</a>
+        </form>
+    </div>
+</div>
+<table id="dg" style="width:100%; " title="查询结果"
+       data-options="rownumbers:false,
+			singleSelect:true,
+			pagination:true,
+			ctrlSelect:true,
+			fitColumns:true,
+			loadMsg:'正在加载,请等待....',
+			url:'__URL__/getList',
+			method:'post',
+			toolbar:'#tb',
+			">
+    <thead>
+        <tr>
+            <volist name="table_title" id="vo"  >
+                <th data-options="field:'{$key}',align:'center',width:'50px'">{$vo}</th>
+            </volist>
+        </tr>
+    </thead>
+</table>
+</body>
+</html>
